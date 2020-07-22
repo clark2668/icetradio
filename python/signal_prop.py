@@ -1,10 +1,10 @@
-from icecube import icetray, dataio, dataclasses
+from icecube import icetray
 
 class SignalProp(icetray.I3Module):
 	def __init__(self, context):
 		icetray.I3Module.__init__(self, context)
 		self.default_param_value = 42
-		self.AddParameter("SomeParam", "Docstrin...", default_param_value)
+		self.AddParameter("SomeParam", "Docstrin...", self.default_param_value)
 
 	def Configure(self):
 		self.some_param = self.GetParameter("SomeParam")
