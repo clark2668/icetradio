@@ -1,3 +1,9 @@
 [submodule "extern/radiotools"]
 	path = extern/radiotools
 	url = https://github.com/nu-radio/radiotools.git
+[submodule "extern/NuRadioReco"]
+	path = extern/NuRadioReco
+	url = https://github.com/nu-radio/NuRadioReco.git
+[submodule "extern/NuRadioMC"]
+	path = extern/NuRadioMC
+	url = https://github.com/nu-radio/NuRadioMC.git
