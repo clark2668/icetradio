@@ -1,6 +1,9 @@
 # emacs files
 *~
 
+# sublime remot editing files
+._*
+
 __pycache__
 */__pyc
 *.py[cod]
