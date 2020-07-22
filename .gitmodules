@@ -1,0 +1,3 @@
+[submodule "extern/radiotools"]
+	path = extern/radiotools
+	url = https://github.com/nu-radio/radiotools.git
