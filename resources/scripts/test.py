@@ -4,6 +4,6 @@ from icecube.icetradio import signal_prop
 
 tray = I3Tray()
 tray.AddModule(signal_prop.SignalProp, "SignalPropMod",
-	SomeParam=150)
+	propagation_model='analytic')
 tray.Add("Dump")
 tray.Execute(10)
