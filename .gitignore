@@ -1,0 +1,6 @@
+# emacs files
+*~
+
+__pycache__
+*/__pyc
+*.py[cod]
