@@ -45,7 +45,23 @@ class SignalProp(icetray.I3Module):
 
 		# now, we check for solutions
 		r.find_solutions()
-		print("Number of solutions {}".format(r.get_number_of_solutions()))
+		num_solutions = r.get_number_of_solutions()
+		print("Number of solutions {}".format(num_solutions))
+
+
+		#TODO: put in logic for what happens if there is no solution
+
+
+		# we only need a few things from the ray tracer at this phase
+		for iS in range(r.get_number_of_solutions()):
+			C0 = r.get_results()[iS]['C0']
+			C1 = r.get_results()[iS]['C1']
+			sol_type = r.get_solution_type(iS)
+			path_length = r.get_path_length(iS)
+			travel_time = r.get_travel_time(iS)
+			launch_vector = r.get_launch_vector(iS)
+			receive_vector = r.get_receive_vector(iS)
+
 
 
 	def Configure(self):
