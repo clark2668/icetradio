@@ -1,7 +1,11 @@
+# python includes
+import numpy as np
+
 from icecube import icetray
 
 # we need the NuRadioMC signal propagator module
 from NuRadioMC.SignalProp import propagation
+from NuRadioMC.utilities import medium
 
 class SignalProp(icetray.I3Module):
 	
@@ -9,17 +13,60 @@ class SignalProp(icetray.I3Module):
 		icetray.I3Module.__init__(self, context)
 		
 		self._default_prop_mode='analytic'
+		self._default_ice_model='ARAsim_southpole'
+		self._default_att_model='SP1'
+		
 		self.AddParameter("propagation_model", 
 			"What type of propagation. Only analytic supported currently",
 			self._default_prop_mode)
+		
+		self.AddParameter("ice_model", 
+			"Index of refraction profile",
+			self._default_ice_model)
+		
+		self.AddParameter("attenuation_model", 
+			"Attenuation model",
+			self._default_att_model)
+
+	# do trace will actually do the ray tracing heavy lifting as an interface
+	def do_trace(self):
+		# x1 is "source" position, while x2 is the target
+		x1 = np.array([478, 0, -149])
+		x2 = np.array([635, 0, -5])
+	
+		# call the propagator for this source  & target combination
+		r = self.propagator(x1,
+							x2,
+							medium=self.ice,
+							attenuation_model=self._att_model,
+							n_frequencies_integration=25, # set this to 25
+							n_reflections=0
+							)
+
+		# now, we check for solutions
+		r.find_solutions()
+		print("Number of solutions {}".format(r.get_number_of_solutions()))
+
 
 	def Configure(self):
-		self.prop_model = self.GetParameter("propagation_model")
-		if self.prop_model != self._default_prop_mode:
-			print("propagation_model changed to {}".format(self.prop_model))
+		
+		self._prop_model = self.GetParameter("propagation_model")
+		self._ice_model = self.GetParameter("ice_model")
+		self._att_model = self.GetParameter("attenuation_model")
 
 		# get the propagator from NuRadioMC
-		self.propagator = propagation.get_propagation_module(self.prop_model)
+		self.propagator = propagation.get_propagation_module(self._prop_model)
+		
+		# get the ice from NuRadioMC
+		self.ice = medium.get_ice_model(self._ice_model)
+
+		self.do_trace()
 
 	def DAQ(self, frame):
 		self.PushFrame(frame)
+
+
+
+
+
+
