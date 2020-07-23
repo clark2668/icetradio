@@ -4,6 +4,9 @@
 # sublime remot editing files
 ._*
 
+# mac files
+*DS_Store*
+
 __pycache__
 */__pyc
 *.py[cod]
