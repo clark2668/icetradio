@@ -1,7 +1,7 @@
 # python includes
 import numpy as np
 
-from icecube import icetray
+from icecube import icetray, dataclasses
 
 # we need the NuRadioMC signal propagator module
 from NuRadioMC.SignalProp import propagation
@@ -29,7 +29,7 @@ class SignalProp(icetray.I3Module):
 			self._default_att_model)
 
 	# do trace will actually do the ray tracing heavy lifting as an interface
-	def do_trace(self):
+	def do_trace(self, frame):
 		# x1 is "source" position, while x2 is the target
 		x1 = np.array([478, 0, -149])
 		x2 = np.array([635, 0, -5])
@@ -43,10 +43,11 @@ class SignalProp(icetray.I3Module):
 							n_reflections=0
 							)
 
-		# now, we check for solutions
-		r.find_solutions()
+		
+		r.find_solutions() # find solutions
 		num_solutions = r.get_number_of_solutions()
-		print("Number of solutions {}".format(num_solutions))
+		frame.Put("num_sols", icetray.I3Int(num_solutions))
+		# print("Number of solutions {}".format(num_solutions))
 
 
 		#TODO: put in logic for what happens if there is no solution
@@ -55,14 +56,13 @@ class SignalProp(icetray.I3Module):
 		# we only need a few things from the ray tracer at this phase
 		for iS in range(r.get_number_of_solutions()):
 			C0 = r.get_results()[iS]['C0']
-			C1 = r.get_results()[iS]['C1']
-			sol_type = r.get_solution_type(iS)
-			path_length = r.get_path_length(iS)
-			travel_time = r.get_travel_time(iS)
-			launch_vector = r.get_launch_vector(iS)
-			receive_vector = r.get_receive_vector(iS)
-
-
+			# C1 = r.get_results()[iS]['C1']
+			# sol_type = r.get_solution_type(iS)
+			# path_length = r.get_path_length(iS)
+			# travel_time = r.get_travel_time(iS)
+			# launch_vector = r.get_launch_vector(iS)
+			# receive_vector = r.get_receive_vector(iS)
+			# frame.Put("C0_{}".format(iS),dataclasses.I3Double(C0))
 
 	def Configure(self):
 		
@@ -76,9 +76,8 @@ class SignalProp(icetray.I3Module):
 		# get the ice from NuRadioMC
 		self.ice = medium.get_ice_model(self._ice_model)
 
-		self.do_trace()
-
-	def DAQ(self, frame):
+	def Physics(self, frame):
+		self.do_trace(frame)
 		self.PushFrame(frame)
 
 
