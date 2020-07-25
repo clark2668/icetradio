@@ -8,3 +8,10 @@ i3_add_library(icetradio
 	USE_TOOLS boost python
 	USE_PROJECTS icetray dataclasses serialization
 )
+
+i3_add_pybindings(icetradio
+	private/pybindings/module.cxx
+
+	USE_TOOLS boost python
+	USE_PROJECTS icetray dataclasses
+)
