@@ -1,4 +1,4 @@
-from icecube import icetray, dataio, dataclasses, phys_services, icetradio
+from icecube import icetray, dataio, dataclasses, phys_services
 from I3Tray import I3Tray
 from icecube.icetradio import signal_prop
 

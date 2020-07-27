@@ -1,7 +1,7 @@
 # python includes
 import numpy as np
 
-from icecube import icetray, dataclasses
+from icecube import icetray, dataclasses, icetradio
 
 # we need the NuRadioMC signal propagator module
 from NuRadioMC.SignalProp import propagation
@@ -49,6 +49,9 @@ class SignalProp(icetray.I3Module):
 		frame.Put("num_sols", icetray.I3Int(num_solutions))
 		# print("Number of solutions {}".format(num_solutions))
 
+		trace_record = icetradio.I3RayTraceRecord()
+		trace_record.num_solutions = num_solutions
+
 
 		#TODO: put in logic for what happens if there is no solution
 
@@ -63,6 +66,8 @@ class SignalProp(icetray.I3Module):
 			# launch_vector = r.get_launch_vector(iS)
 			# receive_vector = r.get_receive_vector(iS)
 			# frame.Put("C0_{}".format(iS),dataclasses.I3Double(C0))
+
+		frame.Put("TraceRecord",trace_record)
 
 	def Configure(self):
 		

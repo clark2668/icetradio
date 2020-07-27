@@ -3,7 +3,7 @@ i3_project(icetradio
 )
 
 i3_add_library(icetradio
-	private/dataclasses/I3RayTraceRecord.cxx
+	private/icetradio/dataclasses/I3RayTraceRecord.cxx
 
 	USE_TOOLS boost python
 	USE_PROJECTS icetray dataclasses serialization
