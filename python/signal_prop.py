@@ -46,7 +46,7 @@ class SignalProp(icetray.I3Module):
 		
 		r.find_solutions() # find solutions
 		num_solutions = r.get_number_of_solutions()
-		frame.Put("num_sols", icetray.I3Int(num_solutions))
+		# frame.Put("num_sols", icetray.I3Int(num_solutions))
 		# print("Number of solutions {}".format(num_solutions))
 
 		trace_record = icetradio.I3RayTraceRecord()
@@ -67,7 +67,7 @@ class SignalProp(icetray.I3Module):
 			# receive_vector = r.get_receive_vector(iS)
 			# frame.Put("C0_{}".format(iS),dataclasses.I3Double(C0))
 
-		frame.Put("TraceRecord",trace_record)
+		frame.Put("I3TraceRecord",trace_record)
 
 	def Configure(self):
 		

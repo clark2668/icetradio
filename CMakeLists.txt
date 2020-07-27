@@ -13,5 +13,5 @@ i3_add_pybindings(icetradio
 	private/pybindings/module.cxx
 
 	USE_TOOLS boost python
-	USE_PROJECTS icetray dataclasses
+	USE_PROJECTS icetray dataclasses icetradio
 )
