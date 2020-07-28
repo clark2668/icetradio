@@ -48,12 +48,12 @@ class SignalProp(icetray.I3Module):
 	
 		# call the propagator for this source  & target combination
 		r = self.propagator(x1,
-							x2,
-							medium=self.ice,
-							attenuation_model=self._att_model,
-							n_frequencies_integration=25, # set this to 25
-							n_reflections=0
-							)
+			x2,
+			medium=self.ice,
+			attenuation_model=self._att_model,
+			n_frequencies_integration=25, # set this to 25
+			n_reflections=0
+		)
 
 		
 		r.find_solutions() # find solutions
