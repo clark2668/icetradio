@@ -27,6 +27,18 @@ class SignalProp(icetray.I3Module):
 		self.AddParameter("attenuation_model", 
 			"Attenuation model",
 			self._default_att_model)
+	
+	def Configure(self):
+		
+		self._prop_model = self.GetParameter("propagation_model")
+		self._ice_model = self.GetParameter("ice_model")
+		self._att_model = self.GetParameter("attenuation_model")
+
+		# get the propagator from NuRadioMC
+		self.propagator = propagation.get_propagation_module(self._prop_model)
+		
+		# get the ice from NuRadioMC
+		self.ice = medium.get_ice_model(self._ice_model)
 
 	# do trace will actually do the ray tracing heavy lifting as an interface
 	def do_trace(self, frame):
@@ -46,18 +58,14 @@ class SignalProp(icetray.I3Module):
 		
 		r.find_solutions() # find solutions
 		num_solutions = r.get_number_of_solutions()
-		# frame.Put("num_sols", icetray.I3Int(num_solutions))
-		# print("Number of solutions {}".format(num_solutions))
 
 		trace_record = icetradio.I3RayTraceRecord()
 		trace_record.num_solutions = num_solutions
 
-
 		#TODO: put in logic for what happens if there is no solution
 
-
 		# we only need a few things from the ray tracer at this phase
-		for iS in range(r.get_number_of_solutions()):
+		for iS in range(num_solutions):
 			C0 = r.get_results()[iS]['C0']
 			# C1 = r.get_results()[iS]['C1']
 			# sol_type = r.get_solution_type(iS)
@@ -67,19 +75,7 @@ class SignalProp(icetray.I3Module):
 			# receive_vector = r.get_receive_vector(iS)
 			# frame.Put("C0_{}".format(iS),dataclasses.I3Double(C0))
 
-		frame.Put("I3TraceRecord",trace_record)
-
-	def Configure(self):
-		
-		self._prop_model = self.GetParameter("propagation_model")
-		self._ice_model = self.GetParameter("ice_model")
-		self._att_model = self.GetParameter("attenuation_model")
-
-		# get the propagator from NuRadioMC
-		self.propagator = propagation.get_propagation_module(self._prop_model)
-		
-		# get the ice from NuRadioMC
-		self.ice = medium.get_ice_model(self._ice_model)
+		frame.Put("RayTraceRecord",trace_record)
 
 	def Physics(self, frame):
 		self.do_trace(frame)
