@@ -6,8 +6,6 @@
 
 class I3RayTraceRecord : public I3FrameObject {
 public:
-	// I3RayTraceRecord() {};
-	// ~I3RayTraceRecord() {};
 	int num_solutions;
 
 private:
