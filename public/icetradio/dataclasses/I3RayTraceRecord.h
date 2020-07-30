@@ -5,6 +5,8 @@
 #include <icetray/serialization.h>
 #include <dataclasses/I3Position.h>
 #include <dataclasses/I3Vector.h>
+#include <icetray/I3Units.h> // needed for Print function in cxx file
+
 #include <icetradio/dataclasses/I3RayTraceSolution.h>
 
 class I3RayTraceRecord : public I3FrameObject {

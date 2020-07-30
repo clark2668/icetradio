@@ -14,7 +14,15 @@ void I3RayTraceRecord::serialize(Archive &ar, unsigned version)
 
 std::ostream& I3RayTraceRecord::Print(std::ostream& oss) const{
 	oss << "[numSolutions: " << numSolutions << std::endl;
-	for(auto sample : solutions) oss << solutions << ", ";
+	
+	// print out information about each solution (in one line)
+	for(auto sample : solutions){
+		oss << "    Sol " << sample.solutionNumber << ":";
+		oss << " type " << sample.solutionType << ",";
+		oss << " R " << sample.pathLength/I3Units::m << "m,";
+		oss << " TOF "<< sample.travelTime/I3Units::ns << "ns";
+		oss << std::endl;
+	}
 	oss << "]";
 	return oss;
 }

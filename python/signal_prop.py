@@ -60,20 +60,33 @@ class SignalProp(icetray.I3Module):
 		num_solutions = r.get_number_of_solutions()
 
 		trace_record = icetradio.I3RayTraceRecord()
-		trace_record.num_solutions = num_solutions
-
-		#TODO: put in logic for what happens if there is no solution
+		trace_record.numSolutions = num_solutions
 
 		# we only need a few things from the ray tracer at this phase
 		for iS in range(num_solutions):
-			C0 = r.get_results()[iS]['C0']
-			# C1 = r.get_results()[iS]['C1']
-			# sol_type = r.get_solution_type(iS)
-			# path_length = r.get_path_length(iS)
-			# travel_time = r.get_travel_time(iS)
-			# launch_vector = r.get_launch_vector(iS)
-			# receive_vector = r.get_receive_vector(iS)
-			# frame.Put("C0_{}".format(iS),dataclasses.I3Double(C0))
+
+			trace_solution = icetradio.I3RayTraceSolution()
+
+			trace_solution.solutionNumber = iS
+			trace_solution.solutionType = r.get_solution_type(iS)
+			trace_solution.C0 = r.get_results()[iS]['C0']
+			trace_solution.C1 = r.get_results()[iS]['C1']
+			trace_solution.travelTime = r.get_travel_time(iS) * icetray.I3Units.nanosecond
+			trace_solution.pathLength = r.get_path_length(iS) * icetray.I3Units.meter
+
+			launch_vector = r.get_launch_vector(iS)
+			receive_vector = r.get_receive_vector(iS)
+
+			trace_solution.launchVector = dataclasses.I3Position(launch_vector[0],
+				launch_vector[1],
+				launch_vector[2]
+			)
+			
+			trace_solution.receiveVector = dataclasses.I3Position(receive_vector[0],
+				receive_vector[1],
+				receive_vector[2]
+			)
+			trace_record.solutions.append(trace_solution)
 
 		frame.Put("RayTraceRecord",trace_record)
 
