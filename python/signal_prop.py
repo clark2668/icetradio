@@ -40,29 +40,39 @@ class SignalProp(icetray.I3Module):
 		# get the ice from NuRadioMC
 		self.ice = medium.get_ice_model(self._ice_model)
 
-	# do trace will actually do the ray tracing heavy lifting as an interface
 	def do_trace(self, frame):
-		# x1 is "source" position, while x2 is the target
-		x1 = np.array([478, 0, -149])
-		x2 = np.array([635, 0, -5])
+
+		source = np.array([478, 0, -149])
+		target = np.array([635, 0, -5])
 	
 		# call the propagator for this source  & target combination
-		r = self.propagator(x1,
-			x2,
+		r = self.propagator(source,
+			target,
 			medium=self.ice,
 			attenuation_model=self._att_model,
 			n_frequencies_integration=25, # set this to 25
 			n_reflections=0
 		)
 
-		
 		r.find_solutions() # find solutions
 		num_solutions = r.get_number_of_solutions()
+		
+		# First, we create a I3RayTraceRecord to hold the results of all ray tracing.
+		# Then, we loop over all the solutions we have for this source-target pair
+		# for each solution iS, we will create a I3RayTraceSolution
+		# and fill that solution with the relevant content, including:
+		# the solutionNumber, solutionType, C0, C1, travelTime, and pathLength.
+		# We will also fill in the launchVector and receiveVector.
+		# Note that because I3RayTraceSolution.launchVector and receiveVector
+		# are of the I3Position class, but the NuRadioMC function
+		# get_launch_vector and get_receive_vector return normal
+		# numpy arrays, we have to convert them to I3Positions first.
+		# Finally, we will append the vector of solutions in the trace_record
+		# with the trace_solutions.
 
 		trace_record = icetradio.I3RayTraceRecord()
 		trace_record.numSolutions = num_solutions
 
-		# we only need a few things from the ray tracer at this phase
 		for iS in range(num_solutions):
 
 			trace_solution = icetradio.I3RayTraceSolution()
@@ -73,6 +83,10 @@ class SignalProp(icetray.I3Module):
 			trace_solution.C1 = r.get_results()[iS]['C1']
 			trace_solution.travelTime = r.get_travel_time(iS) * icetray.I3Units.nanosecond
 			trace_solution.pathLength = r.get_path_length(iS) * icetray.I3Units.meter
+
+			# For the launchVector and receiveVector we must get the answer
+			# from NuRadioMC (as a numpy array), and then place the answers into
+			# I3Position objects to be written out
 
 			launch_vector = r.get_launch_vector(iS)
 			receive_vector = r.get_receive_vector(iS)
@@ -86,9 +100,10 @@ class SignalProp(icetray.I3Module):
 				receive_vector[1],
 				receive_vector[2]
 			)
-			trace_record.solutions.append(trace_solution)
 
-		frame.Put("RayTraceRecord",trace_record)
+			trace_record.solutions.append(trace_solution) # append the solution
+
+		frame.Put("RayTraceRecord",trace_record) # put the RayTraceRector into the frame
 
 	def Physics(self, frame):
 		self.do_trace(frame)
