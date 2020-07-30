@@ -26,16 +26,44 @@ class SignalGen(icetray.I3Module):
 	def recover_factors(self, frame):
 
 		mctree = frame.Get('I3MCTree') # get the I3MCTree
-		print(mctree)
+		# print(mctree)
 
-		""" First, recover information about the primary
-		"""
+		primary = mctree.primaries[0]
+		# print(type(primary))
 
 		# primary = dataclasses.get_most_energetic_primary(mctree)
+		daughters = mctree.get_daughters(primary)
+		print(daughters)
+
+		# daughters = mctree.children(primary)
+		# print(daughters)
+		# # print(primaries)
+		# if len(primaries) ==1:
+		# 	idx=0
+		# elif 'I3MCWeightDict' in frame:
+		# 	idx = [i for i in range(len(primaries)) if primaries[i].is_neutrino][0]
+		# print(idx)
+
+		# etot = 0
+
+		# primary = dataclasses.get_most_energetic_primary(mctree)
+		# children = mctree.children(primary)
+		# for child in children:
+		# 	print(child)
+		# 	grandchildren = mctree.children(child)
+		# 	for grandchild in grandchildren:
+		# 		# print(grandchildren)
+		# 		etot+= grandchild.energy
+
+		# print("Etot grandchildren is {}".format(etot))
+		# print("Etot primary is {}".format(primary.energy))
+		# print("About to print the children")
+		# print(children)
+		# print(dataclasses.number_of_children(primary.number_of_children))
 		# pnu = primary.energy/I3Units.eV
 		# pnu = primary.energy
-		for particle in mctree:
-			print(particle)
+		# for particle in mctree:
+			# print(particle)
 
 		# print(primary)
 
@@ -45,7 +73,7 @@ class SignalGen(icetray.I3Module):
 		# print(primary.Get('energy'))
 		# for particle in frame.Get('I3MCTree'):
 
-	def DAQ(self, frame):
+	def Physics(self, frame):
 		self.recover_factors(frame)
 		self.PushFrame(frame)
 
