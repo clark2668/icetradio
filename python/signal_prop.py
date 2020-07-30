@@ -55,7 +55,7 @@ class SignalProp(icetray.I3Module):
 		)
 
 		r.find_solutions() # find solutions
-		num_solutions = r.get_number_of_solutions()
+		num_solutions = r.get_number_of_solutions() # get number of solutions
 		
 		# First, we create a I3RayTraceRecord to hold the results of all ray tracing.
 		# Then, we loop over all the solutions we have for this source-target pair
