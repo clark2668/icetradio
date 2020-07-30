@@ -81,8 +81,8 @@ class SignalProp(icetray.I3Module):
 			trace_solution.solutionType = r.get_solution_type(iS)
 			trace_solution.C0 = r.get_results()[iS]['C0']
 			trace_solution.C1 = r.get_results()[iS]['C1']
-			trace_solution.travelTime = r.get_travel_time(iS) * icetray.I3Units.nanosecond
-			trace_solution.pathLength = r.get_path_length(iS) * icetray.I3Units.meter
+			trace_solution.travelTime = r.get_travel_time(iS) * icetray.I3Units.ns
+			trace_solution.pathLength = r.get_path_length(iS) * icetray.I3Units.m
 
 			# For the launchVector and receiveVector we must get the answer
 			# from NuRadioMC (as a numpy array), and then place the answers into
