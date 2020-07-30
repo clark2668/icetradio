@@ -12,16 +12,18 @@ void I3RayTraceSolution::serialize(Archive &ar, unsigned version)
 	ar & make_nvp("solutionType", solutionType);
 	ar & make_nvp("C0", C0);
 	ar & make_nvp("C1", C1);
+	ar & make_nvp("pathLength", pathLength);
 	ar & make_nvp("travelTime", travelTime);
 	ar & make_nvp("launchVector", launchVector);
 	ar & make_nvp("receiveVector", receiveVector);
 }
 
 std::ostream& I3RayTraceSolution::Print(std::ostream& oss) const{
-	oss << "[     solutionNumber: " << solutionType << std::endl;
+	oss << "[     solutionNumber: " << solutionNumber << std::endl;
 	oss << "        solutionType: " << solutionType << std::endl;
 	oss << "                  C0: " << C0 << std::endl;
 	oss << "                  C1: " << C1 << std::endl;
+	oss << "          pathLength: " << pathLength << std::endl;
 	oss << "          travelTime: " << travelTime << std::endl;
 	oss << "        launchVector: " << launchVector << std::endl;
 	oss << "       receiveVector: " << receiveVector << std::endl;

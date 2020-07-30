@@ -8,10 +8,10 @@
 
 class I3RayTraceSolution : public I3FrameObject {
 public:
-	double C0;
-	double C1;
 	int solutionNumber;
 	int solutionType;
+	double C0;
+	double C1;
 	double pathLength;
 	double travelTime;
 	I3Position launchVector;
