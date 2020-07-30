@@ -103,7 +103,7 @@ class SignalProp(icetray.I3Module):
 
 			trace_record.solutions.append(trace_solution) # append the solution
 
-		frame.Put("RayTraceRecord",trace_record) # put the RayTraceRector into the frame
+		frame.Put("RayTraceRecord",trace_record) # put the RayTraceRecord into the frame
 
 	def Physics(self, frame):
 		self.do_trace(frame)
