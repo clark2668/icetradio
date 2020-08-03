@@ -18,7 +18,7 @@ class SignalGen(icetray.I3Module):
 		self._default_askaryan_mode='Alvarez2009'
 		
 		self.AddParameter("askaryan_model", 
-			"What is the Askaryan model to use.",
+			"Askaryan model to use.",
 			self._default_askaryan_mode)
 
 	def Configure(self):
