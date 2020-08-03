@@ -4,8 +4,7 @@ import numpy as np
 from icecube import icetray, dataclasses
 from icecube.icetray import I3Units
 
-# we need the NuRadioMC signal propagator module
-from NuRadioMC.SignalGen import askaryan
+from NuRadioMC.SignalGen import askaryan # NuRadioMC askaryan module
 
 class SignalGen(icetray.I3Module):
 	
