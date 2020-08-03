@@ -39,7 +39,6 @@ class SignalGen(icetray.I3Module):
 
 		tray_context = self.context # get the tray context
 
-
 		# for the seed only, we will require that it either have been passed in 
 		# as an argument or otherwise be in the context (in that order)
 		# otherwise, we should throw a fatal error
