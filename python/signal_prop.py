@@ -1,9 +1,10 @@
 # python includes
 import numpy as np
 
+# icecube includes
 from icecube import icetray, dataclasses, icetradio
 
-# we need the NuRadioMC signal propagator module
+# NuRadioMC includes
 from NuRadioMC.SignalProp import propagation
 from NuRadioMC.utilities import medium
 

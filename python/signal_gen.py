@@ -1,10 +1,11 @@
 # python includes
 import numpy as np
 
+# icecube includes
 from icecube import icetray, dataclasses
-from icecube.icetray import I3Units
 
-from NuRadioMC.SignalGen import askaryan # NuRadioMC askaryan module
+# NuRadioMC includes
+from NuRadioMC.SignalGen import askaryan
 
 class SignalGen(icetray.I3Module):
 	
