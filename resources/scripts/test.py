@@ -1,15 +1,41 @@
+import math
+
 from icecube import icetray, dataio, dataclasses, phys_services, icetradio
 from I3Tray import I3Tray
 from icecube.icetradio import signal_prop, signal_gen
 
 
+icetray.set_log_level(icetray.I3LogLevel.LOG_INFO)
+
 # quasi-comoplete working list
 tray = I3Tray()
 # tray.AddModule("I3Reader", filename='numu_sample.i3.zst')
-# tray.context['I3RandomService'] = phys_services.I3GSLRandomService(42)
+
+tray.context['seed'] = 12345
+tray.context['internal_signal_trace_length'] = 200e-9 * icetray.I3Units.second
+tray.context['internal_sampling_rate'] = 5e9 * icetray.I3Units.hertz # 5 GHz
+tray.context['internal_number_of_samples'] =				\
+	int(													\
+		math.ceil(											\
+			tray.context['internal_signal_trace_length']	\
+			* tray.context['internal_sampling_rate']		\
+			/2.												\
+		)													\
+		*2													\
+	)
+# tray.context['internal_dt'] = 1./ tray.context['internal_sampling_rate']
+# tray_context = tray.context
+# print(tray_info)
+# if not 'internal_dt' in tray_context:
+	# print("internal_dtds is missing in the tray context")
+# if not 'internal_dtds' in tray.TrayInfo()
+# ?if tray.context['internal_dtds']:	print("Tray containts internal_dt")
+
+
+tray.context['I3RandomService'] = phys_services.I3GSLRandomService(tray.context['seed'])
 tray.Add("I3InfiniteSource", stream=icetray.I3Frame.Physics) #add an infinite source in a P-frame to play with
-tray.AddModule(signal_prop.SignalProp, "SignalPropMod")
-# tray.AddModule(signal_gen.SignalGen, "SignalGen")
+# tray.AddModule(signal_prop.SignalProp, "SignalPropMod")
+tray.AddModule(signal_gen.SignalGen, "SignalGen")
 tray.Add("Dump")
 tray.Add("I3Writer", filename="quick.i3.zst")
 tray.Execute(2)
