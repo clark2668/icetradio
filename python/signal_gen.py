@@ -57,23 +57,20 @@ class SignalGen(icetray.I3Module):
 
 		self._askaryan_model = self.GetParameter("askaryan_model")
 		if 'askaryan_model' in tray_context:
-			switch_askaryan_model = tray_context['askaryan_model']
-			if switch_askaryan_model != self._default_askaryan_model:
-				self._askaryan_model = switch_askaryan_module
+			if tray_context['askaryan_model'] != self._default_askaryan_model:
+				self._askaryan_model = tray_context['askaryan_model']
 				icetray.logging.log_info("Signal generation module switched to {}".format(self._askaryan_model))
 
 		self._n_samples = self.GetParameter("n_samples")
 		if 'internal_number_of_samples' in tray_context:
-			switch_n_samples = tray_context['internal_number_of_samples']
-			if switch_n_samples != self._default_n_samples:
-				self._n_samples = switch_n_samples
+			if tray_context['internal_number_of_samples'] != self._default_n_samples:
+				self._n_samples = tray_context['internal_number_of_samples']
 				icetray.logging.log_info("Askaryan number of samples switched to {}".format(self._n_samples))
 
 		self._sampling_rate = self.GetParameter("sampling_rate")
 		if 'internal_sampling_rate' in tray_context:
-			switch_sampling_rate = tray_context['internal_sampling_rate']
-			if switch_sampling_rate != self._default_sampling_rate:
-				self._sampling_rate = switch_sampling_rate
+			if tray_context['internal_sampling_rate'] != self._default_sampling_rate:
+				self._sampling_rate = tray_context['internal_sampling_rate']
 				icetray.logging.log_info("Askaryan sampling rate switched to {}".format(self._sampling_rate))
 
 		self._dt = 1./ self._sampling_rate
@@ -81,17 +78,23 @@ class SignalGen(icetray.I3Module):
 		
 	def get_emission(self, frame):
 
-		thetac = np.arccos(1/1.35)
+		# for more information on how the askaryan module workds
+		# and it's various parameters, please consult NuRadioMC
+		# https://github.com/nu-radio/NuRadioMC/blob/master/NuRadioMC/SignalGen/askaryan.py
+
+		nindex = 1.35
+		thetac = np.arccos(1/nindex)
 
 		signal = askaryan.get_time_trace(
-			energy = 1e18, # energy of the shower
-			theta = thetac, # viewangle
+			energy = 1e18,
+			theta = thetac,
 			N=self._n_samples,
 			dt=self._dt,
 			shower_type='HAD',
-			n_index=1.35,
+			n_index=nindex,
 			R=1,
-			model=self._askaryan_model
+			model=self._askaryan_model,
+			seed=self._seed
 		)
 
 	def recover_factors(self, frame):
