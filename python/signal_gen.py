@@ -15,11 +15,11 @@ class SignalGen(icetray.I3Module):
 	def __init__(self, context):
 		icetray.I3Module.__init__(self, context)
 		
-		self._default_askaryan_mode='Alvarez2009'
+		self._default_askaryan_model='Alvarez2009'
 		
 		self.AddParameter("askaryan_model", 
 			"Askaryan model to use.",
-			self._default_askaryan_mode)
+			self._default_askaryan_model)
 
 	def Configure(self):
 
