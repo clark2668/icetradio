@@ -4,24 +4,42 @@ import numpy as np
 from icecube import icetray, dataclasses
 from icecube.icetray import I3Units
 
-
 # we need the NuRadioMC signal propagator module
-from NuRadioMC.SignalProp import propagation
-from NuRadioMC.utilities import medium
+from NuRadioMC.SignalGen import askaryan
+
+# TODO add GSL RNG as service
+# TODO add setting of seed from GSL RNG service
 
 class SignalGen(icetray.I3Module):
 	
 	def __init__(self, context):
 		icetray.I3Module.__init__(self, context)
 		
-		# self._default_prop_mode='analytic'
+		self._default_askaryan_mode='Alvarez2009'
 		
-		# self.AddParameter("propagation_model", 
-		# 	"What type of propagation. Only analytic supported currently",
-		# 	self._default_prop_mode)
+		self.AddParameter("askaryan_model", 
+			"What is the Askaryan model to use.",
+			self._default_askaryan_mode)
 
 	def Configure(self):
-		self.something=2
+
+		self._askaryan_model = self.GetParameter("askaryan_model")
+
+	# def get_emission(frame):
+
+		# spectrum = askaryan.get_frequency_spectrum(
+		# 	energy * fhad
+		# 	viewing_angle
+		# 	n_samples
+		# 	dt
+		# 	"HAD"
+		# 	n_index
+		# 	R
+		# 	model
+		# 	seed
+
+		# 	)
+
 
 	def recover_factors(self, frame):
 
@@ -74,7 +92,8 @@ class SignalGen(icetray.I3Module):
 		# for particle in frame.Get('I3MCTree'):
 
 	def Physics(self, frame):
-		self.recover_factors(frame)
+		# self.get_emission(frame)
+		# self.recover_factors(frame)
 		self.PushFrame(frame)
 
 
