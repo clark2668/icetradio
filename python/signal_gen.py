@@ -24,6 +24,9 @@ class SignalGen(icetray.I3Module):
 	def Configure(self):
 
 		self._askaryan_model = self.GetParameter("askaryan_model")
+		self.rng = self.context["I3RandomService"]
+		if not self.rng:
+			icetray.logging.log_fatal("No RNG found! Please add one, e.g. 'tray.context['I3RandomService'] = phys_services.I3GSLRandomService(...)'")
 
 	# def get_emission(frame):
 
