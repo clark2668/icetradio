@@ -78,7 +78,7 @@ class SignalGen(icetray.I3Module):
 		
 	def get_emission(self, frame):
 
-		# for more information on how the askaryan module workds
+		# for more information on how the askaryan module works
 		# and it's various parameters, please consult NuRadioMC
 		# https://github.com/nu-radio/NuRadioMC/blob/master/NuRadioMC/SignalGen/askaryan.py
 
