@@ -136,11 +136,14 @@ class TreeThinner(icetray.I3Module):
 		thin_mctree = dataclasses.I3MCTree()
 		thin_mctree.add_primary(primary)
 
-		num_particles = len(mctree) # and get its length
+		num_particles = len(mctree) # get number of particles in the mctree
 		if num_particles == 1:
+			
 			# catch the case where there was no interaction and just return outright
 			icetray.logging.log_info("There are no children of the primary")
+		
 		else:
+
 			# otherwise, loop through the mctree and look for energy depositions
 			for particle in mctree:
 			
