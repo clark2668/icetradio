@@ -142,43 +142,6 @@ class SignalGen(icetray.I3Module):
 
 		frame.Put("I3MCTreeThin", thin_mctree)
 
-		# prototyping version where we try to thin the existing tree
-		# but this was hard
-		# children = mctree.children(primary)
-		# num_children = mctree.number_of_children(primary)
-
-		# # first, catch the case where there was no interaction
-		# # and just return outright
-		# if num_children == 0:
-		# 	icetray.logging.log_info("There are no children of the primary")
-		# 	return
-
-		# # recursively loop through the children
-		# for child in children:
-			
-		# 	# don't worry about this particle (or any of it's children)
-		# 	# if it's below the energy cut threshold
-		# 	if child.energy < self._energy_cut:
-		# 		mctree.erase(child) # erase this primary and it's children
-		# 		continue
-			
-		# 	else:
-				
-		# 		# if the child is not a cascade, trim further
-		# 		if not child.is_cascade:
-		# 			grandchildren = mctree.children(child)
-		# 			num_grandchildren = mctree.number_of_children(child)
-		# 			if num_grandchildren > 0:
-		# 				this_grandchild = 
-
-		# for particle in mctree:
-		# 	print(particle)
-
-		
-		# a second version where we instead try to only save the particles
-		# which are cascades in a much reduced secondary I3MCTree
-		
-
 	def Physics(self, frame):
 		# self.get_emission(frame)
 		self.thin_i3mctree(frame)
