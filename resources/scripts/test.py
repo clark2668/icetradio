@@ -36,6 +36,7 @@ tray.context['I3RandomService'] = phys_services.I3GSLRandomService(tray.context[
 # tray.Add("I3InfiniteSource", stream=icetray.I3Frame.Physics) #add an infinite source in a P-frame to play with
 # tray.AddModule(signal_prop.SignalProp, "SignalPropMod")
 # tray.Add("Dump")
+tray.AddModule(signal_gen.TreeThinner, "TreeThinner")
 tray.AddModule(signal_gen.SignalGen, "SignalGen")
 tray.Add("I3Writer", filename="quick.i3.zst")
 tray.Execute(30)
