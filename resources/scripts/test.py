@@ -9,7 +9,7 @@ icetray.set_log_level(icetray.I3LogLevel.LOG_INFO)
 
 # quasi-comoplete working list
 tray = I3Tray()
-# tray.AddModule("I3Reader", filename='numu_sample.i3.zst')
+tray.AddModule("I3Reader", filename='numu_sample.i3.zst')
 
 tray.context['seed'] = 12345
 tray.context['internal_signal_trace_length'] = 200e-9 * icetray.I3Units.second
@@ -33,12 +33,12 @@ tray.context['internal_number_of_samples'] =				\
 
 
 tray.context['I3RandomService'] = phys_services.I3GSLRandomService(tray.context['seed'])
-tray.Add("I3InfiniteSource", stream=icetray.I3Frame.Physics) #add an infinite source in a P-frame to play with
+# tray.Add("I3InfiniteSource", stream=icetray.I3Frame.Physics) #add an infinite source in a P-frame to play with
 # tray.AddModule(signal_prop.SignalProp, "SignalPropMod")
+# tray.Add("Dump")
 tray.AddModule(signal_gen.SignalGen, "SignalGen")
-tray.Add("Dump")
 tray.Add("I3Writer", filename="quick.i3.zst")
-tray.Execute(2)
+tray.Execute(30)
 
 
 # dummy code for rapid prototyping

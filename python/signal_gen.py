@@ -3,6 +3,7 @@ import numpy as np
 
 # icecube includes
 from icecube import icetray, dataclasses
+from icecube.dataclasses import I3Particle
 
 # NuRadioMC includes
 from NuRadioMC.SignalGen import askaryan
@@ -15,6 +16,7 @@ class SignalGen(icetray.I3Module):
 		self._default_askaryan_model = 'Alvarez2009'
 		self._default_n_samples = 1000
 		self._default_sampling_rate = 5e9 * icetray.I3Units.hertz
+		self._default_energy_cut = 0.1e15 * icetray.I3Units.eV
 
 		# there is no default seed, we should always make the user specify
 		# the seed, otherwise we risk undefined behavior at the 
@@ -35,6 +37,10 @@ class SignalGen(icetray.I3Module):
 		self.AddParameter("sampling_rate", 
 			"Sampling rate of Askaryan trace from signal class",
 			self._default_sampling_rate)
+
+		self.AddParameter("energy_cut",
+			"Minimum energy deposition to be considered",
+			self._default_energy_cut)
 
 	def Configure(self):
 
@@ -75,6 +81,12 @@ class SignalGen(icetray.I3Module):
 
 		self._dt = 1./ self._sampling_rate
 		icetray.logging.log_debug("Askaryan dt is {}".format(self._dt))
+
+		self._energy_cut = self.GetParameter("energy_cut")
+		if 'energy_cut' in tray_context:
+			if tray_context['energy_cut'] != self._energy_cut:
+				self._energy_cut = tray_context['energy_cut']
+				icetray.log_info.log_info("Minimum energy cut switched tio {}".format(self._energy_cut))
 		
 	def get_emission(self, frame):
 
@@ -97,59 +109,79 @@ class SignalGen(icetray.I3Module):
 			seed=self._seed
 		)
 
-	def recover_factors(self, frame):
-
+	def thin_i3mctree(self, frame):
+		
 		mctree = frame.Get('I3MCTree') # get the I3MCTree
-		# print(mctree)
-
 		primary = mctree.primaries[0]
-		# print(type(primary))
+		
+		# make a thinned mctree which only contains relevant energy depositions
+		thin_mctree = dataclasses.I3MCTree()
+		thin_mctree.add_primary(primary)
 
-		# primary = dataclasses.get_most_energetic_primary(mctree)
-		daughters = mctree.get_daughters(primary)
-		print(daughters)
+		num_particles = len(mctree) # and get its length
+		if num_particles == 1:
+			# catch the case where there was no interaction and just return outright
+			icetray.logging.log_info("There are no children of the primary")
+		else:
+			# otherwise, loop through the mctree and look for energy depositions
+			for particle in mctree:
+			
+				# skip the primary
+				if particle == primary:
+					continue
 
-		# daughters = mctree.children(primary)
-		# print(daughters)
-		# # print(primaries)
-		# if len(primaries) ==1:
-		# 	idx=0
-		# elif 'I3MCWeightDict' in frame:
-		# 	idx = [i for i in range(len(primaries)) if primaries[i].is_neutrino][0]
-		# print(idx)
+				# don't worry about this particle if it's energy is below the threshold
+				if particle.energy < self._energy_cut:
+					continue
 
-		# etot = 0
+				# and only add cascades cascades ("energy depositions") to the thin_mctree
+				# specifically EPlus, EMinus, Brems, DeltaE, PairProd, NuclInt, Hadrons, PiPlus or PiMinus
+				if particle.is_cascade:
+					icetray.logging.log_info("Cascade!")
+					thin_mctree.append_child(primary, particle)
 
-		# primary = dataclasses.get_most_energetic_primary(mctree)
+		frame.Put("I3MCTreeThin", thin_mctree)
+
+		# prototyping version where we try to thin the existing tree
+		# but this was hard
 		# children = mctree.children(primary)
+		# num_children = mctree.number_of_children(primary)
+
+		# # first, catch the case where there was no interaction
+		# # and just return outright
+		# if num_children == 0:
+		# 	icetray.logging.log_info("There are no children of the primary")
+		# 	return
+
+		# # recursively loop through the children
 		# for child in children:
-		# 	print(child)
-		# 	grandchildren = mctree.children(child)
-		# 	for grandchild in grandchildren:
-		# 		# print(grandchildren)
-		# 		etot+= grandchild.energy
+			
+		# 	# don't worry about this particle (or any of it's children)
+		# 	# if it's below the energy cut threshold
+		# 	if child.energy < self._energy_cut:
+		# 		mctree.erase(child) # erase this primary and it's children
+		# 		continue
+			
+		# 	else:
+				
+		# 		# if the child is not a cascade, trim further
+		# 		if not child.is_cascade:
+		# 			grandchildren = mctree.children(child)
+		# 			num_grandchildren = mctree.number_of_children(child)
+		# 			if num_grandchildren > 0:
+		# 				this_grandchild = 
 
-		# print("Etot grandchildren is {}".format(etot))
-		# print("Etot primary is {}".format(primary.energy))
-		# print("About to print the children")
-		# print(children)
-		# print(dataclasses.number_of_children(primary.number_of_children))
-		# pnu = primary.energy/I3Units.eV
-		# pnu = primary.energy
 		# for particle in mctree:
-			# print(particle)
+		# 	print(particle)
 
-		# print(primary)
-
-		# print(primary)
-		# print(primary.energy)
-		# primary = mctree.get_most_energetic_primary()
-		# print(primary.Get('energy'))
-		# for particle in frame.Get('I3MCTree'):
+		
+		# a second version where we instead try to only save the particles
+		# which are cascades in a much reduced secondary I3MCTree
+		
 
 	def Physics(self, frame):
-		self.get_emission(frame)
-		# self.recover_factors(frame)
+		# self.get_emission(frame)
+		self.thin_i3mctree(frame)
 		self.PushFrame(frame)
 
 
