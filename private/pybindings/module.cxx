@@ -5,6 +5,7 @@
 #include <icetradio/dataclasses/I3RayTraceSolution.h>
 #include <icetradio/dataclasses/I3RayTraceRecord.h>
 #include <icetradio/dataclasses/I3Trace.h>
+#include <icetradio/dataclasses/I3EField.h>
 
 
 // void register_I3Trace()
@@ -17,6 +18,27 @@
 // 		.def(bp::dataclass_suite<I3Trace>())
 // 	;
 // }
+
+void register_I3EField()
+{
+	namespace bp = boost::python;
+	bp::class_<I3EField, I3EFieldPtr, bp::bases<I3FrameObject> >("I3EField")
+
+		#define PROPS (eR) (eTheta) (ePhi)
+		BOOST_PP_SEQ_FOR_EACH(WRAP_RW, I3EField, PROPS)
+		#undef PROPS
+
+		.def(bp::dataclass_suite<I3EField>())
+	;
+}
+
+void register_I3VectorI3EField()
+{
+	namespace bp = boost::python;
+	
+	bp::class_<I3Vector<I3EField > >("I3VectorI3EField")
+		.def(bp::dataclass_suite<I3Vector<I3EField > > ());
+}
 
 void register_I3Trace()
 {
@@ -81,6 +103,8 @@ I3_PYTHON_MODULE(icetradio)
 {
 	load_project("icetradio", false);
 
+	register_I3EField();
+	register_I3VectorI3EField();
 	register_I3Trace();
 	register_I3VectorI3Trace();
 	register_I3RayTraceSolution();
