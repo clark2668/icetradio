@@ -1,4 +1,7 @@
 from icecube import icetray, dataclasses
+from radiotools import coordinatesystems as cstrans
+from radiotools import helper as hp
+
 
 z_surface = dataclasses.I3Constants.SurfaceElev \
 			- dataclasses.I3Constants.OriginElev
@@ -35,3 +38,11 @@ def convert_i3_to_global(input_position):
 	)
 
 	return output_position
+
+def calculate_polarization_vector(launch_vector, shower_axis):
+	""" calculates the polarization vector in spherical coordinates (eR, eTheta, ePhi)
+	"""
+	polarization_direction = np.cross(launch_vector, np.cross(shower_axis, launch_vector))
+	polarization_direction /= np.linalg.norm(polarization_direction)
+	cs = cstrans.cstrafo(*hp.cartesian_to_spherical(*launch_vector))
+	return cs.transform_from_ground_to_onsky(polarization_direction)
