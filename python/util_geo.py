@@ -1,6 +1,7 @@
 from icecube import icetray, dataclasses
 from radiotools import coordinatesystems as cstrans
 from radiotools import helper as hp
+import numpy as np
 
 
 z_surface = dataclasses.I3Constants.SurfaceElev \
