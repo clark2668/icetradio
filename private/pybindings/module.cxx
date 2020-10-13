@@ -23,7 +23,6 @@ void register_I3EField()
 void register_I3VectorI3EField()
 {
 	namespace bp = boost::python;
-	
 	bp::class_<I3Vector<I3EField > >("I3VectorI3EField")
 		.def(bp::dataclass_suite<I3Vector<I3EField > > ());
 }
@@ -44,7 +43,6 @@ void register_I3Trace()
 void register_I3VectorI3Trace()
 {
 	namespace bp = boost::python;
-	
 	bp::class_<I3Vector<I3Trace > >("I3VectorI3Trace")
 		.def(bp::dataclass_suite<I3Vector<I3Trace > > ());
 }
@@ -80,7 +78,6 @@ void register_I3RayTraceRecord()
 void register_I3VectorI3RayTraceSolution()
 {
 	namespace bp = boost::python;
-	
 	bp::class_<I3Vector<I3RayTraceSolution > >("I3VectorI3RayTraceSolution")
 		.def(bp::dataclass_suite<I3Vector<I3RayTraceSolution > > ());
 }
