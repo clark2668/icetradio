@@ -47,4 +47,7 @@ package, and its dependencies `NuRadioReco <https://github.com/nu-radio/NuRadioR
 and `radiotools <https://github.com/nu-radio/radiotools>`_.
 
 Dependencies are managed in the :code:`extern` directory.
+Because we only use :code:`NuRadioMC` as a "backend" of sorts, you generally
+do *not* need to install the :code:`NuRadioMC` dependencies for 
+:code:`icetradio` to work.
 
