@@ -7,18 +7,6 @@
 #include <icetradio/dataclasses/I3Trace.h>
 #include <icetradio/dataclasses/I3EField.h>
 
-
-// void register_I3Trace()
-// {
-// 	namespace bp = boost::python;
-// 	bp::class_<I3Trace, I3TracePtr, bp::bases<I3FrameObject> >("I3Trace")
-
-// 		.add_property("traceStartTime", &I3Trace::GetTraceStartTime, &I3Trace::SetTraceStartTime)
-
-// 		.def(bp::dataclass_suite<I3Trace>())
-// 	;
-// }
-
 void register_I3EField()
 {
 	namespace bp = boost::python;
@@ -96,7 +84,6 @@ void register_I3VectorI3RayTraceSolution()
 	bp::class_<I3Vector<I3RayTraceSolution > >("I3VectorI3RayTraceSolution")
 		.def(bp::dataclass_suite<I3Vector<I3RayTraceSolution > > ());
 }
-
 
 
 I3_PYTHON_MODULE(icetradio)
