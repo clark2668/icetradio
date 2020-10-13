@@ -10,6 +10,9 @@ Overview
 
 icetradio is a tool for doing radio simulations in an IceTray framework.
 
+icetradio is currently written to be "NuRadioMC under the hood" 
+with IceTray functioning as the steering modules.
+
 Philosophy
 ==========
 
@@ -23,8 +26,4 @@ The general philosophy is that the simulation operations should
 live within python for as long as possible, and only use the dataclasses 
 when it's time to read/write things from/to disk. 
 As a result, the dataclasses are *intentionally* primitive.
-
-icetradio is currently written to be "NuRadioMC under the hood" 
-with IceTray functioning as the steering modules.
-
 
