@@ -13,6 +13,7 @@ Overview
 
 
 .. toctree::
+	:maxdepth: 3
 	design_philosophy
 	installation_dependencies
 
