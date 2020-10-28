@@ -1,0 +1,3 @@
+StationID, AntennaID, CenterX, CenterY, CenterZ, OrientationTheta, OrientationPhi, RotationTheta, RotationPhi, AntennaType, AntennaModel
+1,1,0.0,0.0,0.0,0.0,0.0,90.0,0.0,dipole,RNOG_vpol_v1_n1.73
+1,2,0.0,0.0,10.0,0.0,0.0,90.0,0.0,dipole,RNOG_vpol_v1_n1.73
