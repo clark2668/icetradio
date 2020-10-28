@@ -1,3 +1,5 @@
+.. _installation_dependencies:
+
 Installation and Dependencies
 =============================
 
