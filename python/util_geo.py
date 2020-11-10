@@ -7,6 +7,24 @@ import numpy as np
 z_surface = dataclasses.I3Constants.SurfaceElev \
 			- dataclasses.I3Constants.OriginElev
 
+def get_iceantennageo(gcdfile):
+	'''
+	Gets the I3IceAntennaGeometry from a GCD file.
+	'''
+	frame = gcdfile.pop_frame()
+	while not frame.Has("I3IceAntennaGeometry"):
+		frame = gcdfile.pop_frame()
+
+	return frame.Get("I3IceAntennaGeometry").iceantennageo
+
+def calculate_polarization_vector(launch_vector, shower_axis):
+	""" calculates the polarization vector in spherical coordinates (eR, eTheta, ePhi)
+	"""
+	polarization_direction = np.cross(launch_vector, np.cross(shower_axis, launch_vector))
+	polarization_direction /= np.linalg.norm(polarization_direction)
+	cs = cstrans.cstrafo(*hp.cartesian_to_spherical(*launch_vector))
+	return cs.transform_from_ground_to_onsky(polarization_direction)
+
 def convert_i3_to_global(input_position):
 	"""
 	Convert from IceCube to surface oriented coordinates
@@ -40,10 +58,3 @@ def convert_i3_to_global(input_position):
 
 	return output_position
 
-def calculate_polarization_vector(launch_vector, shower_axis):
-	""" calculates the polarization vector in spherical coordinates (eR, eTheta, ePhi)
-	"""
-	polarization_direction = np.cross(launch_vector, np.cross(shower_axis, launch_vector))
-	polarization_direction /= np.linalg.norm(polarization_direction)
-	cs = cstrans.cstrafo(*hp.cartesian_to_spherical(*launch_vector))
-	return cs.transform_from_ground_to_onsky(polarization_direction)
