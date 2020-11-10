@@ -4,15 +4,12 @@ import numpy as np
 # icecube includes
 from icecube import icetray, dataclasses, icetradio
 from icecube.dataclasses import I3Particle
-from icecube.icetradio import util_geo, util_phys, signal_prop
+from icecube.icetradio import util_geo, util_phys, signal_prop, signal_gen
 
 # NuRadioMC includes
-from NuRadioMC.SignalGen import askaryan
 from radiotools import helper as hp
-from radiotools import coordinatesystems as cstrans
 from NuRadioMC.SignalProp import propagation
 from NuRadioMC.utilities import medium
-
 
 
 class NuKernel(icetray.I3Module):
@@ -173,8 +170,11 @@ class NuKernel(icetray.I3Module):
 			# get the source (vertex) position, and move it into surface oriented coordinates
 			source = particle.pos
 			source = util_geo.convert_i3_to_global(source)
-
-			shower_axis = np.array([particle.dir.x, particle.dir.y, particle.dir.z]) # where it's GOING
+			
+			# where it's GOING
+			# in I3Position format (not simple numpy array)
+			# so that we are uniform between shower_axis and launch_vector
+			shower_axis = dataclasses.I3Position(particle.dir.x, particle.dir.y, particle.dir.z) 
 			deposited_energy = particle.energy
 			shower_type = particle.type
 			em_or_had = util_phys.pick_em_or_had(shower_type)
@@ -182,6 +182,7 @@ class NuKernel(icetray.I3Module):
 				icetray.logging.log_warn("A particle ({}) has an undefined type. Skipping it.".format(shower_type))
 				continue
 
+			n_index = self.ice.get_index_of_refraction(source)
 
 			for iceantkey, g in antgeomap:
 				
@@ -197,9 +198,22 @@ class NuKernel(icetray.I3Module):
 					source=source,
 					target=target)
 
-				# # now, do signals
-				# for iS in range(record.numSolutions):
+				# now, do signals
+				for iS in range(record.numSolutions):
 
+					# print("Type of launch vector is {}".format(record.solutions[iS].launchVector))
+					field = signal_gen.generate_signal(
+						deposited_energy=deposited_energy,
+						shower_axis=shower_axis,
+						em_or_had=em_or_had,
+						launch_vector=record.solutions[iS].launchVector,
+						distance=record.solutions[iS].pathLength,
+						n_index=n_index,
+						dt=self._dt,
+						n_samples=self._n_samples,
+						model=self._askaryan_model,
+						seed=self._seed,
+						)
 
 
 

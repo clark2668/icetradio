@@ -3,41 +3,58 @@ import numpy as np
 
 from icecube import icetray, dataclasses, icetradio
 from icecube.dataclasses import I3Particle
+from icecube.icetradio import util_geo, util_dataclasses
+
+from NuRadioMC.SignalGen import askaryan
+from radiotools import helper as hp
+
 
 def generate_signal(
-
+	deposited_energy,
+	shower_axis,
+	em_or_had,
+	launch_vector,
+	distance,
+	n_index,
+	dt,
+	n_samples,
+	model,
+	seed
 	):
 
-	"""
-	A function to get the Askaryan signal
+	local_launch_vector = util_dataclasses.i3pos_to_np(launch_vector)
+	local_shower_axis = util_dataclasses.i3pos_to_np(shower_axis)
 
-	Get the askaryan field
+	viewing_angle = hp.get_angle(local_shower_axis, local_launch_vector)
 
-	Parameters
-	----------
-	propagator: NuRadioMC.SignalProp propagation object
-		a propagator from the NuRadioMC.SignaProp class
-	
-	ice_model: NuRadioMC.utilities medium object
-		a medium object from the NuRadioMC.utilities class
-	
-	attenuation_model: string
-		name of the desired attenuation model 
-		from the NuRadioMC.utilities attenuation models
+	signal = askaryan.get_time_trace(
+		energy = deposited_energy,
+		theta = viewing_angle,
+		N = n_samples,
+		dt= dt,
+		shower_type=em_or_had,
+		n_index=n_index,
+		R=distance,
+		model=model,
+		seed=seed
+		)
 
-	source: I3Position
-		I3Position of the source in surface-oriented coordinates 
-		in meters
+	# calculate the polarization
+	polarization_direction_onsky = util_geo.calculate_polarization_vector(local_launch_vector, local_shower_axis)
+	icetray.logging.log_debug("Polarization direction on sky {}".format(polarization_direction_onsky))
 
-	target: I3Position
-		I3Position of the target in surface-oriented coordiantes
-		in meters
+	# create the e-fields at the antenna
+	this_eR, this_eTheta, this_ePhi = np.outer(polarization_direction_onsky, signal)
 
-	Returns
-	-------
-	trace_record: I3RayTraceRecord
-		the ray tracing record for this source/target pair
-	"""
+	sampling_rate = 1./dt
+	eR = util_dataclasses.fill_I3Trace(this_eR, 0, sampling_rate)
+	eTheta = util_dataclasses.fill_I3Trace(this_eTheta, 0, sampling_rate)
+	ePhi = util_dataclasses.fill_I3Trace(this_ePhi, 0, sampling_rate)
+
+	field = util_dataclasses.fill_I3EField(eR, eTheta, ePhi)
+
+	return field
+
 
 class TreeThinner(icetray.I3Module):
 
