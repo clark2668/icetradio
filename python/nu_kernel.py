@@ -201,7 +201,6 @@ class NuKernel(icetray.I3Module):
 				# now, do signals
 				for iS in range(record.numSolutions):
 
-					# print("Type of launch vector is {}".format(record.solutions[iS].launchVector))
 					field = signal_gen.generate_signal(
 						deposited_energy=deposited_energy,
 						shower_axis=shower_axis,
