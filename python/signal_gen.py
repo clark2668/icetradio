@@ -4,6 +4,41 @@ import numpy as np
 from icecube import icetray, dataclasses, icetradio
 from icecube.dataclasses import I3Particle
 
+def generate_signal(
+
+	):
+
+	"""
+	A function to get the Askaryan signal
+
+	Get the askaryan field
+
+	Parameters
+	----------
+	propagator: NuRadioMC.SignalProp propagation object
+		a propagator from the NuRadioMC.SignaProp class
+	
+	ice_model: NuRadioMC.utilities medium object
+		a medium object from the NuRadioMC.utilities class
+	
+	attenuation_model: string
+		name of the desired attenuation model 
+		from the NuRadioMC.utilities attenuation models
+
+	source: I3Position
+		I3Position of the source in surface-oriented coordinates 
+		in meters
+
+	target: I3Position
+		I3Position of the target in surface-oriented coordiantes
+		in meters
+
+	Returns
+	-------
+	trace_record: I3RayTraceRecord
+		the ray tracing record for this source/target pair
+	"""
+
 class TreeThinner(icetray.I3Module):
 
 	def __init__(self, context):

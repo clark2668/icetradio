@@ -42,7 +42,7 @@ tray.AddModule(signal_gen.TreeThinner, "TreeThinner")
 # tray.AddModule(signal_gen.SignalGen, "SignalGen")
 tray.AddModule(nu_kernel.NuKernel, "NuKernel")
 tray.Add("I3Writer", filename="quick.i3.zst")
-tray.Execute(4)
+tray.Execute(30)
 
 
 # dummy code for rapid prototyping

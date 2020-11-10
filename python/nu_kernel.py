@@ -4,7 +4,7 @@ import numpy as np
 # icecube includes
 from icecube import icetray, dataclasses, icetradio
 from icecube.dataclasses import I3Particle
-from icecube.icetradio import util_geo, signal_prop
+from icecube.icetradio import util_geo, util_phys, signal_prop
 
 # NuRadioMC includes
 from NuRadioMC.SignalGen import askaryan
@@ -78,15 +78,15 @@ class NuKernel(icetray.I3Module):
 		# and some geometry information
 		#############################################
 		#############################################
-		self.AddParameter("gcd_file",
-			"GCD file containing the antenna geometry",
+
+		self.AddParameter("ant_geo_map",
+			"The I3IceAntennaGeoMap",
 			None)
 
 
 	def Configure(self):
 
 		tray_context = self.context # get the tray context
-
 
 		# signal generation parameters
 		#############################################
@@ -146,27 +146,44 @@ class NuKernel(icetray.I3Module):
 		#############################################
 		if 'gcd_file' not in tray_context:
 			icetray.logging.log_fatal("No GCD file is specified. Please set gcd_file in the tray context")
-		self.gcd = tray_context['gcd_file']
-
+		self.antgeomap = util_geo.get_iceantennageo(tray_context['gcd_file'])
 
 	def run_nu_kernel(self, frame):
 
 		# get the list of particles from the *thinned* mctree
 		if 'I3MCTreeThin' not in frame:
-			icetray.logging.log_fatal('Frame does not contain the thinned tree I3MCTreeThin \n Please tray.AddModule(TreeThinner) first!')
+			icetray.logging.log_fatal('Frame does not contain the thinned tree I3MCTreeThin \nPlease tray.AddModule(TreeThinner) first!')
 		mctree = frame.Get('I3MCTreeThin')
 
+		primary = mctree.primaries[0]
+		num_particles = len(mctree)
+		if num_particles == 1:
+			icetray.logging.log_info("There are no children of the primary")
+
 		# load the list of antennas
-		antgeo = util_geo.get_iceantennageo(self.gcd)
+		antgeomap = self.antgeomap
 
 		# now, we loop over every particle, and every antenna, and do ray tracing
 		for particle in mctree:
+
+			# skip the primary
+			if particle == primary:
+				continue
 
 			# get the source (vertex) position, and move it into surface oriented coordinates
 			source = particle.pos
 			source = util_geo.convert_i3_to_global(source)
 
-			for iceantkey, g in antgeo:
+			shower_axis = np.array([particle.dir.x, particle.dir.y, particle.dir.z]) # where it's GOING
+			deposited_energy = particle.energy
+			shower_type = particle.type
+			em_or_had = util_phys.pick_em_or_had(shower_type)
+			if em_or_had is 'udef':
+				icetray.logging.log_warn("A particle ({}) has an undefined type. Skipping it.".format(shower_type))
+				continue
+
+
+			for iceantkey, g in antgeomap:
 				
 				# get the target (antenna) position, and move it into surface oriented coordinates
 				target = g.position
@@ -179,6 +196,11 @@ class NuKernel(icetray.I3Module):
 					attenuation_model=self._att_model,
 					source=source,
 					target=target)
+
+				# # now, do signals
+				# for iS in range(record.numSolutions):
+
+
 
 
 	def Physics(self, frame):
