@@ -2,12 +2,12 @@ import math
 
 from icecube import icetray, dataio, dataclasses, phys_services, icetradio
 from I3Tray import I3Tray
-from icecube.icetradio import signal_prop, signal_gen
+from icecube.icetradio import signal_gen, nu_kernel
 
 
 icetray.set_log_level(icetray.I3LogLevel.LOG_INFO)
 
-# quasi-comoplete working list
+# quasi-complete working list
 tray = I3Tray()
 tray.AddModule("I3Reader", filename='numu_sample.i3.zst')
 
@@ -33,13 +33,16 @@ tray.context['internal_number_of_samples'] =				\
 
 
 tray.context['I3RandomService'] = phys_services.I3GSLRandomService(tray.context['seed'])
+i3file = dataio.I3File("make_gcd_file/sampleGCD.i3.gz", "r")
+tray.context['gcd_file'] = i3file
 # tray.Add("I3InfiniteSource", stream=icetray.I3Frame.Physics) #add an infinite source in a P-frame to play with
 # tray.AddModule(signal_prop.SignalProp, "SignalPropMod")
 # tray.Add("Dump")
-# tray.AddModule(signal_gen.TreeThinner, "TreeThinner")
-tray.AddModule(signal_gen.SignalGen, "SignalGen")
+tray.AddModule(signal_gen.TreeThinner, "TreeThinner")
+# tray.AddModule(signal_gen.SignalGen, "SignalGen")
+tray.AddModule(nu_kernel.NuKernel, "NuKernel")
 tray.Add("I3Writer", filename="quick.i3.zst")
-tray.Execute(30)
+tray.Execute(4)
 
 
 # dummy code for rapid prototyping

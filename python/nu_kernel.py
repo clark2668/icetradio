@@ -4,7 +4,7 @@ import numpy as np
 # icecube includes
 from icecube import icetray, dataclasses, icetradio
 from icecube.dataclasses import I3Particle
-from icecube.icetradio import util_geo
+from icecube.icetradio import util_geo, signal_prop
 
 # NuRadioMC includes
 from NuRadioMC.SignalGen import askaryan
@@ -29,7 +29,9 @@ class NuKernel(icetray.I3Module):
 	def __init__(self, context):
 		icetray.I3Module.__init__(self, context)
 		
-		# signal generator parameters
+		# signal generation parameters
+		#############################################
+		#############################################
 		self._default_askaryan_model = 'Alvarez2009'
 		self._default_n_samples = 1000
 		self._default_sampling_rate = 5e9 * icetray.I3Units.hertz
@@ -55,6 +57,8 @@ class NuKernel(icetray.I3Module):
 			self._default_sampling_rate)
 
 		# signal propagation parameters
+		#############################################
+		#############################################
 		self._default_prop_mode='analytic'
 		self._default_ice_model='ARAsim_southpole'
 		self._default_att_model='SP1'
@@ -71,10 +75,22 @@ class NuKernel(icetray.I3Module):
 			"Attenuation model",
 			self._default_att_model)
 
+		# and some geometry information
+		#############################################
+		#############################################
+		self.AddParameter("gcd_file",
+			"GCD file containing the antenna geometry",
+			None)
+
 
 	def Configure(self):
 
 		tray_context = self.context # get the tray context
+
+
+		# signal generation parameters
+		#############################################
+		#############################################
 
 		# for the seed only, we will require that it either have been passed in 
 		# as an argument or otherwise be in the context (in that order)
@@ -91,7 +107,6 @@ class NuKernel(icetray.I3Module):
 		# for all other objects, we can check for positional or context overrides,
 		# and otherwise, just leave things as the default
 
-		# signal generation parameters
 		self._askaryan_model = self.GetParameter("askaryan_model")
 		if 'askaryan_model' in tray_context:
 			if tray_context['askaryan_model'] != self._default_askaryan_model:
@@ -114,6 +129,8 @@ class NuKernel(icetray.I3Module):
 		icetray.logging.log_debug("Askaryan dt is {}".format(self._dt))
 
 		# signal propagation parameters
+		#############################################
+		#############################################
 		self._prop_model = self.GetParameter("propagation_model")
 		self._ice_model = self.GetParameter("ice_model")
 		self._att_model = self.GetParameter("attenuation_model")
@@ -124,16 +141,44 @@ class NuKernel(icetray.I3Module):
 		# get the ice from NuRadioMC
 		self.ice = medium.get_ice_model(self._ice_model)
 
-	def run_nu_kernel(frame):
+		# GCD filel information
+		#############################################
+		#############################################
+		if 'gcd_file' not in tray_context:
+			icetray.logging.log_fatal("No GCD file is specified. Please set gcd_file in the tray context")
+		self.gcd = tray_context['gcd_file']
 
-		# first, get the list of particles from the *thinned* mctree
+
+	def run_nu_kernel(self, frame):
+
+		# get the list of particles from the *thinned* mctree
 		if 'I3MCTreeThin' not in frame:
-			icetray.logging.log_fatal('Frame does not contain the thinned tree I3MCTreeThin')
-
+			icetray.logging.log_fatal('Frame does not contain the thinned tree I3MCTreeThin \n Please tray.AddModule(TreeThinner) first!')
 		mctree = frame.Get('I3MCTreeThin')
-		for particle in mctree:
-			print(particle)
 
+		# load the list of antennas
+		antgeo = util_geo.get_iceantennageo(self.gcd)
+
+		# now, we loop over every particle, and every antenna, and do ray tracing
+		for particle in mctree:
+
+			# get the source (vertex) position, and move it into surface oriented coordinates
+			source = particle.pos
+			source = util_geo.convert_i3_to_global(source)
+
+			for iceantkey, g in antgeo:
+				
+				# get the target (antenna) position, and move it into surface oriented coordinates
+				target = g.position
+				target = util_geo.convert_i3_to_global(target)
+
+				# do ray tracing
+				record = signal_prop.do_ray_tracing(
+					propagator=self.propagator,
+					ice_model=self.ice,
+					attenuation_model=self._att_model,
+					source=source,
+					target=target)
 
 
 	def Physics(self, frame):
