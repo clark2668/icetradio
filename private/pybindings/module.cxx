@@ -35,6 +35,39 @@ void register_I3VectorI3EField()
 
 ///////////////////////////////
 ///////////////////////////////
+// I3RadioMCSummary
+///////////////////////////////
+///////////////////////////////
+void register_I3RadioMCSummary()
+{
+	namespace bp = boost::python;
+	bp::class_<register_I3RadioMCSummary, register_I3RadioMCSummaryPtr, bp::bases<I3FrameObject> >("I3RadioMCSummary")
+
+		#define PROPS (ray_trace_record) (signals)
+		BOOST_PP_SEQ_FOR_EACH(WRAP_RW, register_I3RadioMCSummary, PROPS)
+		#undef PROPS
+
+		.def(bp::dataclass_suite<I3RadioMCSummary>())
+	;
+}
+
+void register_I3IceAntennaRadioMCSummaryMap()
+{
+	namespace bp = boost::python;
+	bp::class<I3IceAntennaRadioMCSummaryMap, bp::bases<I3FrameObject>, I3IceAntennaRadioMCSummaryMapPtr>("I3IceAntennaRadioMCSummaryMap")
+		.def(bp::dataclass_suite<I3IceAntennaRadioMCSummaryMap>());
+}
+
+void register_I3ParticleRadioMCSummaryMap()
+{
+	namespace bp = boost::python;
+	bp::class<I3ParticleRadioMCSummaryMap, bp::bases<I3FrameObject>, I3ParticleRadioMCSummaryMapPtr>("I3ParticleRadioMCSummaryMap")
+		.def(bp::dataclass_suite<I3ParticleRadioMCSummaryMap>());
+}
+
+
+///////////////////////////////
+///////////////////////////////
 // I3RadioSignal
 ///////////////////////////////
 ///////////////////////////////
@@ -132,13 +165,23 @@ I3_PYTHON_MODULE(icetradio)
 {
 	load_project("icetradio", false);
 
+	// list of all register functions (alphabetical order for organization)
+
 	register_I3EField();
 	register_I3VectorI3EField();
+	
 	register_I3Trace();
 	register_I3VectorI3Trace();
+	
+	register_I3RadioMCSummary();
+	register_I3IceAntennaRadioMCSummaryMap();
+	register_I3ParticleRadioMCSummaryMap();
+	
 	register_I3RayTraceSolution();
 	register_I3VectorI3RayTraceSolution();
+	
 	register_I3RayTraceRecord();
+	
 	register_I3RadioSignal();
 	register_I3VectorI3RadioSignal();
 }
