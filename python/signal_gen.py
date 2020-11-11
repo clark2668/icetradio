@@ -6,6 +6,7 @@ from icecube.dataclasses import I3Particle
 from icecube.icetradio import util_geo, util_dataclasses
 
 from NuRadioMC.SignalGen import askaryan
+from NuRadioReco.utilities import units, fft
 from radiotools import helper as hp
 
 
@@ -16,6 +17,7 @@ def generate_signal(
 	launch_vector,
 	distance,
 	n_index,
+	attenuation_values,
 	dt,
 	n_samples,
 	model,
@@ -39,27 +41,38 @@ def generate_signal(
 		seed=seed
 		)
 
+	signal_spectrum = fft.time2freq(signal, 1./dt)
+	attenuated_signal_spectrum = signal_spectrum * attenuation_values
+	attenuated_signal = fft.freq2time(attenuated_signal_spectrum, 1./dt)
+
 	# calculate the polarization
 	polarization_direction_onsky = util_geo.calculate_polarization_vector(local_launch_vector, local_shower_axis)
 	icetray.logging.log_debug("Polarization direction on sky {}".format(polarization_direction_onsky))
 
-	# create the e-fields at the antenna
+	# create the e-fields at the antenna, both with and without attenuation factors
 	this_eR, this_eTheta, this_ePhi = np.outer(polarization_direction_onsky, signal)
+	this_eR_attenuated, this_eTheta_attenuated, this_ePhi_attenuated = np.outer(polarization_direction_onsky, attenuated_signal)
 
-	# store the eR, eTheta, ePhi components in trace
+	# store the eR, eTheta, ePhi components in trace for both the un-attenuated and the attenuated field
 	sampling_rate = 1./dt
 	eR = util_dataclasses.fill_I3Trace(this_eR, 0, sampling_rate)
 	eTheta = util_dataclasses.fill_I3Trace(this_eTheta, 0, sampling_rate)
 	ePhi = util_dataclasses.fill_I3Trace(this_ePhi, 0, sampling_rate)
 
-	# put those traces into a field
+	eR_attenuated = util_dataclasses.fill_I3Trace(this_eR_attenuated, 0, sampling_rate)
+	eTheta_attenuated = util_dataclasses.fill_I3Trace(this_eTheta_attenuated, 0, sampling_rate)
+	ePhi_attenuated = util_dataclasses.fill_I3Trace(this_ePhi_attenuated, 0, sampling_rate)
+
+	# put those traces into fields
 	field_noatt = util_dataclasses.fill_I3EField(eR, eTheta, ePhi)
+	field_watt = util_dataclasses.fill_I3EField(eR_attenuated, eTheta_attenuated, ePhi_attenuated)
 
 	# and finally, create and return a signal object
 	signal = icetradio.I3RadioSignal()
 	signal.view_angle = viewing_angle
 	signal.polarization_vector = util_dataclasses.np_to_i3pos(polarization_direction_onsky, 'sph')
 	signal.field_noatt = field_noatt
+	signal.field_watt = field_watt
 
 	return signal
 

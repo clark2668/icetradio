@@ -147,6 +147,10 @@ class NuKernel(icetray.I3Module):
 
 	def run_nu_kernel(self, frame):
 
+		# we'll need an array of frequencies at which we'll calculate attens etc
+		# declare it here so we don't wast time declaring it over and over again
+		ff = np.fft.rfftfreq(self._n_samples, self._dt)
+
 		# get the list of particles from the *thinned* mctree
 		if 'I3MCTreeThin' not in frame:
 			icetray.logging.log_fatal('Frame does not contain the thinned tree I3MCTreeThin \nPlease tray.AddModule(TreeThinner) first!')
@@ -191,12 +195,15 @@ class NuKernel(icetray.I3Module):
 				target = util_geo.convert_i3_to_global(target)
 
 				# do ray tracing
-				record = signal_prop.do_ray_tracing(
+				record, attens = signal_prop.do_ray_tracing(
 					propagator=self.propagator,
 					ice_model=self.ice,
 					attenuation_model=self._att_model,
 					source=source,
-					target=target)
+					target=target,
+					ff=ff,
+					sampling_rate=self._sampling_rate
+					)
 
 				# now, do signals
 				for iS in range(record.numSolutions):
@@ -208,6 +215,7 @@ class NuKernel(icetray.I3Module):
 						launch_vector=record.solutions[iS].launchVector,
 						distance=record.solutions[iS].pathLength,
 						n_index=n_index,
+						attenuation_values=attens[iS],
 						dt=self._dt,
 						n_samples=self._n_samples,
 						model=self._askaryan_model,

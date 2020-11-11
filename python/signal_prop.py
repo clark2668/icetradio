@@ -6,7 +6,9 @@ def do_ray_tracing(
 	ice_model,
 	attenuation_model,
 	source,
-	target
+	target,
+	ff,
+	sampling_rate
 	):
 
 	"""
@@ -34,6 +36,12 @@ def do_ray_tracing(
 	target: I3Position
 		I3Position of the target in surface-oriented coordiantes
 		in meters
+
+	ff: array
+		array of the frequencies (in Hz) where the attenuation values should be calculated
+
+	sampling_rate: double or float
+		the sampling rate (in Hz) needed for the attenuation calculation
 
 	Returns
 	-------
@@ -68,7 +76,14 @@ def do_ray_tracing(
 	trace_record = icetradio.I3RayTraceRecord()
 	trace_record.numSolutions = num_solutions
 
+	# we will need these later in the signal generation module, so let's get them now
+	# they will not be written out in the trace solution object though
+	complex_attenuations = []
+
 	for iS in range(num_solutions):
+
+		the_att = r.get_attenuation(iS, ff, 0.5*sampling_rate)
+		complex_attenuations.append(the_att)
 
 		trace_solution = icetradio.I3RayTraceSolution()
 		
@@ -96,7 +111,7 @@ def do_ray_tracing(
 
 		trace_record.solutions.append(trace_solution)
 
-	return trace_record
+	return trace_record, complex_attenuations
 
 
 
