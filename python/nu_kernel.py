@@ -179,7 +179,7 @@ class NuKernel(icetray.I3Module):
 			# in I3Position format (not simple numpy array)
 			# so that we are uniform between shower_axis and launch_vector
 			shower_axis = dataclasses.I3Position(particle.dir.x, particle.dir.y, particle.dir.z) 
-			deposited_energy = particle.energy
+			deposited_energy = particle.energy / icetray.I3Units.eV # in eV!
 			shower_type = particle.type
 			em_or_had = util_phys.pick_em_or_had(shower_type)
 			if em_or_had is 'udef':
@@ -225,7 +225,7 @@ class NuKernel(icetray.I3Module):
 					# convert the arrival information into a theta and phi for the signal
 					local_recieve_vector = util_dataclasses.i3pos_to_np(record.solutions[iS].receiveVector)
 					theta, phi = hp.cartesian_to_spherical(*local_recieve_vector)
-					signal.arrival_theta = theta
+					signal.arrival_theta = theta * icetray.I3Units.eV
 					signal.arrival_phi = phi
 
 					# finish filling out the signal container
