@@ -46,14 +46,22 @@ def generate_signal(
 	# create the e-fields at the antenna
 	this_eR, this_eTheta, this_ePhi = np.outer(polarization_direction_onsky, signal)
 
+	# store the eR, eTheta, ePhi components in trace
 	sampling_rate = 1./dt
 	eR = util_dataclasses.fill_I3Trace(this_eR, 0, sampling_rate)
 	eTheta = util_dataclasses.fill_I3Trace(this_eTheta, 0, sampling_rate)
 	ePhi = util_dataclasses.fill_I3Trace(this_ePhi, 0, sampling_rate)
 
-	field = util_dataclasses.fill_I3EField(eR, eTheta, ePhi)
+	# put those traces into a field
+	field_noatt = util_dataclasses.fill_I3EField(eR, eTheta, ePhi)
 
-	return field
+	# and finally, create and return a signal object
+	signal = icetradio.I3RadioSignal()
+	signal.view_angle = viewing_angle
+	signal.polarization_vector = util_dataclasses.np_to_i3pos(polarization_direction_onsky, 'sph')
+	signal.field_noatt = field_noatt
+
+	return signal
 
 
 class TreeThinner(icetray.I3Module):

@@ -4,7 +4,7 @@ import numpy as np
 # icecube includes
 from icecube import icetray, dataclasses, icetradio
 from icecube.dataclasses import I3Particle
-from icecube.icetradio import util_geo, util_phys, signal_prop, signal_gen
+from icecube.icetradio import util_dataclasses, util_geo, util_phys, signal_prop, signal_gen
 
 # NuRadioMC includes
 from radiotools import helper as hp
@@ -201,7 +201,7 @@ class NuKernel(icetray.I3Module):
 				# now, do signals
 				for iS in range(record.numSolutions):
 
-					field = signal_gen.generate_signal(
+					signal = signal_gen.generate_signal(
 						deposited_energy=deposited_energy,
 						shower_axis=shower_axis,
 						em_or_had=em_or_had,
@@ -214,6 +214,15 @@ class NuKernel(icetray.I3Module):
 						seed=self._seed,
 						)
 
+					# convert the arrival information into a theta and phi for the signal
+					local_recieve_vector = util_dataclasses.i3pos_to_np(record.solutions[iS].receiveVector)
+					theta, phi = hp.cartesian_to_spherical(*local_recieve_vector)
+					signal.arrival_theta = theta
+					signal.arrival_phi = phi
+
+					# finish filling out the signal container
+					signal.sol_num = record.solutions[iS].solutionNumber
+					signal.sol_type = record.solutions[iS].solutionType
 
 
 	def Physics(self, frame):
