@@ -164,6 +164,10 @@ class NuKernel(icetray.I3Module):
 		# load the list of antennas
 		antgeomap = self.antgeomap
 
+		# for every particle, we create a map between the particle ID and the I3IceAntennaRadioMCSummaryMap
+		# first, create the I3
+		particle_radio_mc_map = icetradio.I3ParticleRadioMCSummaryMap()
+
 		# now, we loop over every particle, and every antenna, and do ray tracing
 		for particle in mctree:
 
@@ -171,10 +175,14 @@ class NuKernel(icetray.I3Module):
 			if particle == primary:
 				continue
 
+
 			# get the source (vertex) position, and move it into surface oriented coordinates
 			source = particle.pos
 			source = util_geo.convert_i3_to_global(source)
-			
+		
+			# for this particle, we need a map between the particle id and the signal
+			iceantenna_radio_mc_map = icetradio.I3IceAntennaRadioMCSummaryMap()
+
 			# where it's GOING
 			# in I3Position format (not simple numpy array)
 			# so that we are uniform between shower_axis and launch_vector
@@ -189,6 +197,9 @@ class NuKernel(icetray.I3Module):
 			n_index = self.ice.get_index_of_refraction(source)
 
 			for iceantkey, g in antgeomap:
+
+				# need a radio mc summary object
+				radio_mc_summary = icetradio.I3RadioMCSummary()
 				
 				# get the target (antenna) position, and move it into surface oriented coordinates
 				target = g.position
@@ -204,6 +215,9 @@ class NuKernel(icetray.I3Module):
 					ff=ff,
 					sampling_rate=self._sampling_rate
 					)
+
+				# store the ray trace record
+				radio_mc_summary.ray_trace_record = record
 
 				# now, do signals
 				for iS in range(record.numSolutions):
@@ -232,6 +246,19 @@ class NuKernel(icetray.I3Module):
 					signal.sol_num = record.solutions[iS].solutionNumber
 					signal.sol_type = record.solutions[iS].solutionType
 
+					# append the signal
+					radio_mc_summary.signals.append(signal)
+
+				# now, put this radio mc summary into the map for this vertex
+				iceantenna_radio_mc_map[iceantkey] = radio_mc_summary
+
+			# now, for this particle, we store the map of radio truths
+			particle_radio_mc_map[particle.id] = iceantenna_radio_mc_map
+
+		# now, this gets stored in the frame
+		if(len(particle_radio_mc_map)>0):
+			# only store the frame if one of the daughter particles actually contributed
+			frame.Put("ParticleRadioMCSummaryMap",particle_radio_mc_map)
 
 	def Physics(self, frame):
 		self.run_nu_kernel(frame)

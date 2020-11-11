@@ -9,7 +9,7 @@ icetray.set_log_level(icetray.I3LogLevel.LOG_INFO)
 
 # quasi-complete working list
 tray = I3Tray()
-tray.AddModule("I3Reader", filename='numu_sample.i3.zst')
+tray.AddModule("I3Reader", filename='nue_sample.i3.zst')
 
 tray.context['seed'] = 12345
 tray.context['internal_signal_trace_length'] = 200e-9 * icetray.I3Units.second
