@@ -3,6 +3,7 @@
 #include <icetray/python/list_indexing_suite.hpp>
 #include <dataclasses/I3Vector.h>
 #include <icetradio/dataclasses/I3EField.h>
+#include <icetradio/dataclasses/I3RadioMCSummary.h>
 #include <icetradio/dataclasses/I3RadioSignal.h>
 #include <icetradio/dataclasses/I3RayTraceRecord.h>
 #include <icetradio/dataclasses/I3RayTraceSolution.h>
@@ -41,10 +42,10 @@ void register_I3VectorI3EField()
 void register_I3RadioMCSummary()
 {
 	namespace bp = boost::python;
-	bp::class_<register_I3RadioMCSummary, register_I3RadioMCSummaryPtr, bp::bases<I3FrameObject> >("I3RadioMCSummary")
+	bp::class_<I3RadioMCSummary, I3RadioMCSummaryPtr, bp::bases<I3FrameObject> >("I3RadioMCSummary")
 
 		#define PROPS (ray_trace_record) (signals)
-		BOOST_PP_SEQ_FOR_EACH(WRAP_RW, register_I3RadioMCSummary, PROPS)
+		BOOST_PP_SEQ_FOR_EACH(WRAP_RW, I3RadioMCSummary, PROPS)
 		#undef PROPS
 
 		.def(bp::dataclass_suite<I3RadioMCSummary>())
@@ -54,14 +55,14 @@ void register_I3RadioMCSummary()
 void register_I3IceAntennaRadioMCSummaryMap()
 {
 	namespace bp = boost::python;
-	bp::class<I3IceAntennaRadioMCSummaryMap, bp::bases<I3FrameObject>, I3IceAntennaRadioMCSummaryMapPtr>("I3IceAntennaRadioMCSummaryMap")
+	bp::class_<I3IceAntennaRadioMCSummaryMap, bp::bases<I3FrameObject>, I3IceAntennaRadioMCSummaryMapPtr>("I3IceAntennaRadioMCSummaryMap")
 		.def(bp::dataclass_suite<I3IceAntennaRadioMCSummaryMap>());
 }
 
 void register_I3ParticleRadioMCSummaryMap()
 {
 	namespace bp = boost::python;
-	bp::class<I3ParticleRadioMCSummaryMap, bp::bases<I3FrameObject>, I3ParticleRadioMCSummaryMapPtr>("I3ParticleRadioMCSummaryMap")
+	bp::class_<I3ParticleRadioMCSummaryMap, bp::bases<I3FrameObject>, I3ParticleRadioMCSummaryMapPtr>("I3ParticleRadioMCSummaryMap")
 		.def(bp::dataclass_suite<I3ParticleRadioMCSummaryMap>());
 }
 

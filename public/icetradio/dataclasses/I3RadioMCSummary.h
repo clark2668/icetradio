@@ -13,7 +13,7 @@
 
 class I3RadioMCSummary : public I3FrameObject {
 public:
-	I3RayTraceRecord ray_trace_record
+	I3RayTraceRecord ray_trace_record;
 	I3Vector<I3RadioSignal> signals;
 
 	std::ostream& Print(std::ostream&) const override;
