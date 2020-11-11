@@ -5,9 +5,11 @@
 #include <icetray/serialization.h>
 #include <dataclasses/I3Vector.h>
 #include <dataclasses/I3Map.h>
+#include <dataclasses/physics/I3ParticleID.h>
+
+#include <dataclasses/IceAntennaKey.h>
 #include <icetradio/dataclasses/I3RayTraceRecord.h>
 #include <icetradio/dataclasses/I3RadioSignal.h>
-#include <dataclasses/IceAntennaKey.h>
 
 
 
@@ -32,7 +34,7 @@ std::ostream& operator<<(std::ostream& oss, const I3RadioMCSummary& p);
 I3_POINTER_TYPEDEFS(I3RadioMCSummary);
 
 typedef I3Map<IceAntennaKey, I3RadioMCSummary> I3IceAntennaRadioMCSummaryMap;
-typedef I3Map<int, I3IceAntennaRadioMCSummaryMap> I3ParticleRadioMCSummaryMap;
+typedef I3Map<I3ParticleID, I3IceAntennaRadioMCSummaryMap> I3ParticleRadioMCSummaryMap;
 
 I3_POINTER_TYPEDEFS(I3IceAntennaRadioMCSummaryMap);
 I3_POINTER_TYPEDEFS(I3ParticleRadioMCSummaryMap);
