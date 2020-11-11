@@ -8,8 +8,8 @@ def pick_em_or_had(type):
 	had_types = [I3Particle.Hadrons, I3Particle.NuclInt]
 
 	if type in had_types:
-		return 'had'
+		return 'HAD'
 	elif type in em_types:
-		return 'em'
+		return 'EM'
 	else:
-		return 'udef'
+		return 'UDEF'

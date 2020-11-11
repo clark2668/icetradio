@@ -24,6 +24,51 @@ def generate_signal(
 	seed
 	):
 
+	"""
+	A function to generate askaryan fields at the antennas
+
+	Get the askaryan signals/fields at the antenna
+
+	Parameters
+	----------
+	deposited_energy: double or float
+		energy deposited in the shower in eV
+	
+	shower_axis: I3Position
+		the shower axis
+	
+	launch_vector: I3Position
+		the launch vector of the ray that makes the signal
+
+	distance: float
+		the path length traveled by the signal (including ray bending!)
+
+	n_index: float
+		the index of refraction at the vertex
+
+	atttenuation_values: complex np array
+		the complex frequency-dependent attenuation factors
+
+	dt: float
+		the time between samples for the askaryan emission, in seconds
+
+	n_samples: int
+		the number of samples to have in the Askaryan emission
+
+	model: string
+		what Askaryan model should be used to generate the emission
+		options are described in NuRadioMC.SignalGen.askaryan
+		https://github.com/nu-radio/NuRadioMC/blob/master/NuRadioMC/SignalGen/askaryan.py
+
+	seed: int
+		what random number seed should be used in generating the askaryan emission
+
+	Returns
+	-------
+	signal: I3RadioSignal
+		the radio signal container for this event
+	"""
+
 	local_launch_vector = util_dataclasses.i3pos_to_np(launch_vector)
 	local_shower_axis = util_dataclasses.i3pos_to_np(shower_axis)
 
@@ -69,7 +114,7 @@ def generate_signal(
 
 	# and finally, create and return a signal object
 	signal = icetradio.I3RadioSignal()
-	signal.view_angle = viewing_angle
+	signal.view_angle = viewing_angle * icetray.I3Units.rad
 	signal.polarization_vector = util_dataclasses.np_to_i3pos(polarization_direction_onsky, 'sph')
 	signal.field_noatt = field_noatt
 	signal.field_watt = field_watt
