@@ -68,7 +68,23 @@ def fill_I3Trace(
 
 	return trace
 
-def i3pos_to_np(pos):
-	return np.array([pos.x, pos.y, pos.z])
+def i3pos_to_np(pos, refframe='car'):
+	if refframe=='car':
+		return np.array([pos.x, pos.y, pos.z])
+	elif refframe=='sph':
+		return np.array([pos.r, pos.theta, pos.phi])
+
+def np_to_i3pos(pos, refframe='car'):
+	if len(pos)>3:
+		icetray.logging.log_error("Input np array has too many ({}) elements. Returning I3Position at 0,0,0".format(len(pos)))
+		return dataclasses.I3Position(0.,0.,0.)
+	if refframe=='car':
+		return dataclasses.I3Position(pos[0], pos[1], pos[2])
+	elif refframe=='sph':
+		return dataclasses.I3Position(pos[0], pos[1], pos[2], dataclasses.I3Position.sph)
+	else:
+		icetray.logging.log_error("Input has unrecognized ref frame ({}) elements. Returning I3Position at 0,0,0".format(refframe))
+		return dataclasses.I3Position(0.,0.,0.)		
+
 
 
