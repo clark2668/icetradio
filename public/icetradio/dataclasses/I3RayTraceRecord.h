@@ -15,6 +15,10 @@ public:
 	I3Vector<I3RayTraceSolution> solutions;
 	std::ostream& Print(std::ostream&) const override;
 
+	bool operator==(const I3RayTraceRecord& rhs) const {
+		return  numSolutions == rhs.numSolutions;
+	}
+
 private:
 	friend class icecube::serialization::access;
 	template <typename Archive> void serialize(Archive &ar, unsigned versfion);
