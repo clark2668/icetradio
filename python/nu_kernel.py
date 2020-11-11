@@ -182,7 +182,7 @@ class NuKernel(icetray.I3Module):
 			deposited_energy = particle.energy / icetray.I3Units.eV # in eV!
 			shower_type = particle.type
 			em_or_had = util_phys.pick_em_or_had(shower_type)
-			if em_or_had is 'udef':
+			if em_or_had is 'UDEF':
 				icetray.logging.log_warn("A particle ({}) has an undefined type. Skipping it.".format(shower_type))
 				continue
 
@@ -225,8 +225,8 @@ class NuKernel(icetray.I3Module):
 					# convert the arrival information into a theta and phi for the signal
 					local_recieve_vector = util_dataclasses.i3pos_to_np(record.solutions[iS].receiveVector)
 					theta, phi = hp.cartesian_to_spherical(*local_recieve_vector)
-					signal.arrival_theta = theta * icetray.I3Units.eV
-					signal.arrival_phi = phi
+					signal.arrival_theta = theta * icetray.I3Units.rad
+					signal.arrival_phi = phi * icetray.I3Units.rad
 
 					# finish filling out the signal container
 					signal.sol_num = record.solutions[iS].solutionNumber
