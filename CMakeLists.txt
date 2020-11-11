@@ -5,6 +5,7 @@ i3_project(icetradio
 i3_add_library(icetradio
 	private/icetradio/dataclasses/I3EField.cxx
 	private/icetradio/dataclasses/I3RadioSignal.cxx
+	private/icetradio/dataclasses/I3RadioMCSummary.cxx
 	private/icetradio/dataclasses/I3RayTraceRecord.cxx
 	private/icetradio/dataclasses/I3RayTraceSolution.cxx
 	private/icetradio/dataclasses/I3Trace.cxx
