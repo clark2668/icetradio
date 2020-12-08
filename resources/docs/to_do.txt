@@ -1,0 +1,8 @@
+# TODO list for icetradio
+
+
+# Nu Kernel
+- Magnification factor
+- Fresnel coefficients for refracted events
+
+# Det Kernel
