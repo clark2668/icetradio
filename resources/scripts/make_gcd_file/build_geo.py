@@ -1,6 +1,7 @@
 from icecube import icetray, dataclasses, dataio
 import os
 import numpy as np
+from radiotools import helper as hp
 
 import argparse
 parser = argparse.ArgumentParser()
@@ -24,9 +25,13 @@ def MakeAntennaGeo(antFile, iAnt):
 	iceantennaGeo = dataclasses.I3IceAntennaGeo()
 	iceantennaGeo.position = dataclasses.I3Position(x, y , z)
 
-	# # FIXME! This is using the zenith and azimuth constructor, but I'm giving it in terms of theta and phi!
-	iceantennaGeo.orientation = dataclasses.I3Direction(OrientationTheta, OrientationPhi)
-	iceantennaGeo.rotation = dataclasses.I3Direction(RotationTheta, RotationPhi)
+	sph_orientation = np.array([OrientationTheta, OrientationPhi])
+	sph_rotation = np.array([RotationTheta, RotationPhi])
+	car_orientation = hp.spherical_to_cartesian(*sph_orientation)
+	car_rotation = hp.spherical_to_cartesian(*sph_rotation) 
+
+	iceantennaGeo.orientation = dataclasses.I3Direction(car_orientation[0], car_orientation[1], car_orientation[2])
+	iceantennaGeo.rotation = dataclasses.I3Direction(car_rotation[0], car_rotation[1], car_rotation[2])
 
 	if AntennaType=='dipole':
 		iceantennaGeo.antennaType = dataclasses.I3IceAntennaGeo.IceAntennaType.dipole
