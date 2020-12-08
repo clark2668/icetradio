@@ -2,7 +2,7 @@ import math
 
 from icecube import icetray, dataio, dataclasses, phys_services, icetradio
 from I3Tray import I3Tray
-from icecube.icetradio import signal_gen, nu_kernel
+from icecube.icetradio import signal_gen, nu_kernel, det_kernel
 
 
 icetray.set_log_level(icetray.I3LogLevel.LOG_INFO)
@@ -41,6 +41,7 @@ tray.context['gcd_file'] = i3file
 tray.AddModule(signal_gen.TreeThinner, "TreeThinner")
 # tray.AddModule(signal_gen.SignalGen, "SignalGen")
 tray.AddModule(nu_kernel.NuKernel, "NuKernel")
+tray.AddModule(det_kernel.DetKernel, "DetKernel")
 tray.Add("I3Writer", filename="quick.i3.zst")
 tray.Execute(30)
 
