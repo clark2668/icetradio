@@ -16,18 +16,22 @@ def generate_signal(
 	em_or_had,
 	launch_vector,
 	distance,
+	arrival_time,
 	n_index,
 	attenuation_values,
 	dt,
 	n_samples,
 	model,
-	seed
+	seed,
+	keep_unattenuated_fields=False
 	):
 
 	"""
 	A function to generate askaryan fields at the antennas
 
-	Get the askaryan signals/fields at the antenna
+	Get the askaryan signals/fields at the antenna. This means that the fields
+	returned by this function will already include the polarization factors,
+	the 1/R, and the attenuation due to the ice.
 
 	Parameters
 	----------
@@ -41,7 +45,10 @@ def generate_signal(
 		the launch vector of the ray that makes the signal
 
 	distance: float
-		the path length traveled by the signal (including ray bending!)
+		the path length traveled by the signal in m (including ray bending!)
+
+	arrival_time: float
+		the time the field arrives at the antenna, in seconds (including ray bending!)
 
 	n_index: float
 		the index of refraction at the vertex
@@ -63,11 +70,17 @@ def generate_signal(
 	seed: int
 		what random number seed should be used in generating the askaryan emission
 
+	keep_unattenuated_fields: bool
+		whether or not to keep a copy of the E-fields that does not have attenuation factors applied
+		default is False, to reduce file output sizes
+
 	Returns
 	-------
 	signal: I3RadioSignal
 		the radio signal container for this event
 	"""
+
+	print("Arrival time is {}".format(arrival_time))
 
 	local_launch_vector = util_dataclasses.i3pos_to_np(launch_vector)
 	local_shower_axis = util_dataclasses.i3pos_to_np(shower_axis)
@@ -94,30 +107,33 @@ def generate_signal(
 	polarization_direction_onsky = util_geo.calculate_polarization_vector(local_launch_vector, local_shower_axis)
 	icetray.logging.log_debug("Polarization direction on sky {}".format(polarization_direction_onsky))
 
-	# create the e-fields at the antenna, both with and without attenuation factors
-	this_eR, this_eTheta, this_ePhi = np.outer(polarization_direction_onsky, signal)
+	# create the e-fields at the antenna
 	this_eR_attenuated, this_eTheta_attenuated, this_ePhi_attenuated = np.outer(polarization_direction_onsky, attenuated_signal)
 
-	# store the eR, eTheta, ePhi components in trace for both the un-attenuated and the attenuated field
+	# store the eR, eTheta, ePhi components in trace for attenuated field
 	sampling_rate = 1./dt
-	eR = util_dataclasses.fill_I3Trace(this_eR, 0, sampling_rate)
-	eTheta = util_dataclasses.fill_I3Trace(this_eTheta, 0, sampling_rate)
-	ePhi = util_dataclasses.fill_I3Trace(this_ePhi, 0, sampling_rate)
-
-	eR_attenuated = util_dataclasses.fill_I3Trace(this_eR_attenuated, 0, sampling_rate)
-	eTheta_attenuated = util_dataclasses.fill_I3Trace(this_eTheta_attenuated, 0, sampling_rate)
-	ePhi_attenuated = util_dataclasses.fill_I3Trace(this_ePhi_attenuated, 0, sampling_rate)
+	eR_attenuated = util_dataclasses.fill_I3Trace(this_eR_attenuated, arrival_time, sampling_rate)
+	eTheta_attenuated = util_dataclasses.fill_I3Trace(this_eTheta_attenuated, arrival_time, sampling_rate)
+	ePhi_attenuated = util_dataclasses.fill_I3Trace(this_ePhi_attenuated, arrival_time, sampling_rate)
 
 	# put those traces into fields
-	field_noatt = util_dataclasses.fill_I3EField(eR, eTheta, ePhi)
 	field_watt = util_dataclasses.fill_I3EField(eR_attenuated, eTheta_attenuated, ePhi_attenuated)
 
 	# and finally, create and return a signal object
 	signal = icetradio.I3RadioSignal()
 	signal.view_angle = viewing_angle * icetray.I3Units.rad
 	signal.polarization_vector = util_dataclasses.np_to_i3pos(polarization_direction_onsky, 'sph')
-	signal.field_noatt = field_noatt
 	signal.field_watt = field_watt
+
+	if keep_unattenuated_fields:
+		# make a copy of the fields that doesn't include the attenuation factor
+		# we can generally *not* save this information as a space saving measure
+		this_eR, this_eTheta, this_ePhi = np.outer(polarization_direction_onsky, signal)
+		eR = util_dataclasses.fill_I3Trace(this_eR, arrival_time, sampling_rate)
+		eTheta = util_dataclasses.fill_I3Trace(this_eTheta, arrival_time, sampling_rate)
+		ePhi = util_dataclasses.fill_I3Trace(this_ePhi, arrival_time, sampling_rate)
+		field_noatt = util_dataclasses.fill_I3EField(eR, eTheta, ePhi)
+		signal.field_noatt = field_noatt
 
 	return signal
 

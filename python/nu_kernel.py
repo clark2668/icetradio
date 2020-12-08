@@ -164,8 +164,7 @@ class NuKernel(icetray.I3Module):
 		# load the list of antennas
 		antgeomap = self.antgeomap
 
-		# for every particle, we create a map between the particle ID and the I3IceAntennaRadioMCSummaryMap
-		# first, create the I3
+		# for every particle, we create a map between the particle ID and the I3RadioMCSummary
 		particle_radio_mc_map = icetradio.I3ParticleRadioMCSummaryMap()
 
 		# now, we loop over every particle, and every antenna, and do ray tracing
@@ -175,6 +174,8 @@ class NuKernel(icetray.I3Module):
 			if particle == primary:
 				continue
 
+			# time of the vertex in nanoseconds
+			vertex_time = particle.time
 
 			# get the source (vertex) position, and move it into surface oriented coordinates
 			source = particle.pos
@@ -222,12 +223,19 @@ class NuKernel(icetray.I3Module):
 				# now, do signals
 				for iS in range(record.numSolutions):
 
+					# the time this field arrives at the antenna is the sum
+					# of the time of the vertex and the propagation time
+					# this is a value in ns, so we have to convert to seconds
+					# when we pass it to the signal generator
+					arrival_time = vertex_time + record.solutions[iS].travelTime
+
 					signal = signal_gen.generate_signal(
 						deposited_energy=deposited_energy,
 						shower_axis=shower_axis,
 						em_or_had=em_or_had,
 						launch_vector=record.solutions[iS].launchVector,
 						distance=record.solutions[iS].pathLength,
+						arrival_time=arrival_time / icetray.I3Units.s,
 						n_index=n_index,
 						attenuation_values=attens[iS],
 						dt=self._dt,
