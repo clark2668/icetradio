@@ -80,8 +80,6 @@ def generate_signal(
 		the radio signal container for this event
 	"""
 
-	print("Arrival time is {}".format(arrival_time))
-
 	local_launch_vector = util_dataclasses.i3pos_to_np(launch_vector)
 	local_shower_axis = util_dataclasses.i3pos_to_np(shower_axis)
 
