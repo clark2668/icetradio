@@ -4,11 +4,10 @@ import numpy as np
 # icecube includes
 from icecube import icetray, dataclasses, icetradio
 from icecube.dataclasses import I3Particle
-from icecube.icetradio import util_dataclasses, util_geo, util_phys, signal_prop, signal_gen
+from icecube.icetradio import util_dataclasses, util_geo, util_phys, det_response
 
 # NuRadioMC includes
 from radiotools import helper as hp
-from NuRadioReco.detector import antennapattern
 
 class DetKernel(icetray.I3Module):
 
@@ -50,7 +49,7 @@ class DetKernel(icetray.I3Module):
 
 		tray_context = self.context # get the tray context
 
-		# signal generation parameters
+		# internal sampling parameters
 		#############################################
 		#############################################
 
@@ -92,6 +91,12 @@ class DetKernel(icetray.I3Module):
 			icetray.logging.log_fatal("No GCD file is specified. Please set gcd_file in the tray context")
 		self.antgeomap = util_geo.get_iceantennageo(tray_context['gcd_file'])
 
+		# antenna models
+		#############################################
+		#############################################
+		self.antenna_model_dict = {}
+		det_response.load_antenna_responses(self.antgeomap, self.antenna_model_dict)
+
 	def run_det_kernel(self, frame):
 
 		# we'll need an array of frequencies at which we'll calculate attens etc
@@ -109,10 +114,8 @@ class DetKernel(icetray.I3Module):
 		# loop over antennas
 		for iceantkey, g in antgeomap:
 
-			# TODO: put this into the Configure
 			antenna_model = g.antennaModel
-			antenna_provider = antennapattern.AntennaPatternProvider()
-			antenna_pattern = antenna_provider.load_antenna_pattern(antenna_model)
+			antenna_pattern = self.antenna_model_dict[antenna_model]
 			antenna_orientation = np.asarray([g.orientation.theta, g.orientation.phi, g.rotation.theta, g.rotation.phi])
 			# VEL = antenna_pattern.get_antenna_response_vectorized(ff, zenith, azimuth)
 
