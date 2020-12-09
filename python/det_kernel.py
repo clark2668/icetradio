@@ -8,9 +8,7 @@ from icecube.icetradio import util_dataclasses, util_geo, util_phys, signal_prop
 
 # NuRadioMC includes
 from radiotools import helper as hp
-from NuRadioMC.SignalProp import propagation
-from NuRadioMC.utilities import medium
-
+from NuRadioReco.detector import antennapattern
 
 class DetKernel(icetray.I3Module):
 
@@ -104,6 +102,31 @@ class DetKernel(icetray.I3Module):
 			icetray.logging.log_warn('Frame does not contain ParticleRadioMCSummaryMap. Do nothing (frame will not be pushed). \n(Btw, please make sure tray.AddModule(NuKernel) is included!')
 			return 1
 		particle_radio_mc_map = frame.Get('ParticleRadioMCSummaryMap')
+
+		# load the list of antennas
+		antgeomap = self.antgeomap
+
+		# loop over antennas
+		for iceantkey, g in antgeomap:
+
+			# TODO: put this into the Configure
+			antenna_model = g.antennaModel
+			antenna_provider = antennapattern.AntennaPatternProvider()
+			antenna_pattern = antenna_provider.load_antenna_pattern(antenna_model)
+			antenna_orientation = np.asarray([g.orientation.theta, g.orientation.phi, g.rotation.theta, g.rotation.phi])
+			# VEL = antenna_pattern.get_antenna_response_vectorized(ff, zenith, azimuth)
+
+			# # loop over vertices
+			# for particle, radiomcmap in particle_radio_mc_map:
+
+			# 	if iceantkey not in radiomcmap.keys():
+			# 		icetray.logging.log_info("Antenna key {} is not in the map for this particle")
+			# 		continue # skip to the next particle
+
+			# 	# get the radio summary for this antenna/vertex combination
+			# 	this_radio_mc_summary = radiomcmap[iceantkey]
+
+			# 	# now, we must fold the Efield with a model of the antenna
 
 
 	def Physics(self, frame):
