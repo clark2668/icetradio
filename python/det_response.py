@@ -49,7 +49,6 @@ def fold_efields(efield, zenith, azimuth, antenna_orientation, antenna_pattern):
 	ff = util_dataclasses.get_frequencies_I3EField(efield)
 	
 	# get the fourier transforms of the field
-	eR_freq = fft.time2freq(efield.eR.trace, efield.eR.samplingRate)
 	eTheta_freq = fft.time2freq(efield.eTheta.trace, efield.eTheta.samplingRate)
 	ePhi_freq = fft.time2freq(efield.ePhi.trace, efield.ePhi.samplingRate)
 
