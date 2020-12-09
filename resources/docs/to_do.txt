@@ -6,3 +6,4 @@
 - Fresnel coefficients for refracted events
 
 # Det Kernel
+- Adding of noise

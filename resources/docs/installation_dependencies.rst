@@ -37,3 +37,5 @@ Dependencies are managed in the :code:`extern` directory.
 Because we only use :code:`NuRadioMC` as a "backend" of sorts, you generally
 do *not* need to install the :code:`NuRadioMC` dependencies for 
 :code:`icetradio` to work.
+
+You'll also need the `requests` package, so please pip install --target that somewhere sensible.
