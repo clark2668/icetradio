@@ -2,6 +2,29 @@ import numpy as np
 
 from icecube import icetray, dataclasses, icetradio
 
+from NuRadioReco.utilities import fft
+
+def get_frequencies_I3EField(field):
+
+	"""
+	Get the frequencies for an I3EField
+
+	Parameters
+	----------
+	field: I3EField
+		an I3EField
+
+	Returns
+	-------
+	frequencies: array
+		the frequencies corresponding to the Fourier transform of the field
+	"""
+
+	dT = 1./ field.eR.samplingRate # dT = 1/samplingRate
+	num_samples = len(field.eR.trace) # the number of samples
+	frequencies = np.fft.rfftfreq(num_samples, dT)
+	return frequencies
+
 def fill_I3EField(
 	eR,
 	eTheta,

@@ -12,8 +12,9 @@ tray = I3Tray()
 tray.AddModule("I3Reader", filename='nue_sample.i3.zst')
 
 tray.context['seed'] = 12345
-tray.context['internal_signal_trace_length'] = 200e-9 * icetray.I3Units.second
-tray.context['internal_sampling_rate'] = 5e9 * icetray.I3Units.hertz # 5 GHz
+# currently tuned for 1024 samples at 4 GHz
+tray.context['internal_signal_trace_length'] = 256e-9 * icetray.I3Units.second
+tray.context['internal_sampling_rate'] = 4e9 * icetray.I3Units.hertz # 5 GHz
 tray.context['internal_number_of_samples'] =				\
 	int(													\
 		math.ceil(											\
@@ -23,6 +24,7 @@ tray.context['internal_number_of_samples'] =				\
 		)													\
 		*2													\
 	)
+
 # tray.context['internal_dt'] = 1./ tray.context['internal_sampling_rate']
 # tray_context = tray.context
 # print(tray_info)

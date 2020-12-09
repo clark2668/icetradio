@@ -114,22 +114,33 @@ class DetKernel(icetray.I3Module):
 		# loop over antennas
 		for iceantkey, g in antgeomap:
 
-			antenna_model = g.antennaModel
-			antenna_pattern = self.antenna_model_dict[antenna_model]
+			antenna_pattern = self.antenna_model_dict[g.antennaModel]
 			antenna_orientation = np.asarray([g.orientation.theta, g.orientation.phi, g.rotation.theta, g.rotation.phi])
-			# VEL = antenna_pattern.get_antenna_response_vectorized(ff, zenith, azimuth)
 
-			# # loop over vertices
-			# for particle, radiomcmap in particle_radio_mc_map:
+			# loop over vertices
+			for particle, radiomcmap in particle_radio_mc_map:
 
-			# 	if iceantkey not in radiomcmap.keys():
-			# 		icetray.logging.log_info("Antenna key {} is not in the map for this particle")
-			# 		continue # skip to the next particle
+				if iceantkey not in radiomcmap.keys():
+					icetray.logging.log_info("Antenna key {} is not in the map for this particle")
+					continue # skip to the next particle
 
-			# 	# get the radio summary for this antenna/vertex combination
-			# 	this_radio_mc_summary = radiomcmap[iceantkey]
+				# get the radio summary for this antenna/vertex combination
+				this_radio_mc_summary = radiomcmap[iceantkey]
 
-			# 	# now, we must fold the Efield with a model of the antenna
+				# loop over the solutions we have
+				num_solutions = this_radio_mc_summary.ray_trace_record.numSolutions
+				for iR in range(num_solutions):
+					this_signal = this_radio_mc_summary.signals[iR]
+					this_theta = this_signal.arrival_theta
+					this_phi = this_signal.arrival_phi
+					this_efield = this_signal.field_watt #I3EField with attenuation and pol included
+
+					# now, we must fold the Efield with a model of the antenna
+					voltage_trace = det_response.fold_efields(efield=this_efield, 
+						zenith=this_theta,
+						azimuth=this_phi,
+						antenna_orientation=antenna_orientation,
+						antenna_pattern=antenna_pattern)
 
 
 	def Physics(self, frame):
