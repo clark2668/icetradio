@@ -91,6 +91,27 @@ def fill_I3Trace(
 
 	return trace
 
+def get_I3Trace_times(the_trace):
+	"""
+	Get the times for an I3Trace
+
+	Parameters
+	----------
+	trace: I3Trace
+		the trace for which we want time samples
+
+	Returns
+	-------
+	times: array
+		the times when the trace has been sampled
+	"""
+	num_samples = len(the_trace.trace)
+	dT = 1./the_trace.samplingRate
+	T0 = the_trace.traceStartTime
+	times = np.arange(0, num_samples/the_trace.samplingRate - 0.1/the_trace.samplingRate, dT) + T0
+	return times
+
+
 def i3pos_to_np(pos, refframe='car'):
 	if refframe=='car':
 		return np.array([pos.x, pos.y, pos.z])
