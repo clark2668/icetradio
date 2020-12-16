@@ -80,6 +80,9 @@ def plot_field_and_trace(the_field, trace_after_antenna, trace_after_amps, info=
 	axs[2][1].set_xlim([0,1])
 
 	plt.tight_layout()
-	fig.savefig('event.png')
+	save_tile = 'event.png'
+	if info is not None:
+		save_tile='event_' + info + 'png'
+	fig.savefig(save_tile)
 	plt.close(fig)
 	del fig, axs
