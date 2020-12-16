@@ -4,7 +4,7 @@ import numpy as np
 # icecube includes
 from icecube import icetray, dataclasses, icetradio
 from icecube.dataclasses import I3Particle
-from icecube.icetradio import util_dataclasses, util_geo, util_phys, det_response
+from icecube.icetradio import util_dataclasses, util_geo, util_phys, util_plotting, det_response
 
 # NuRadioMC includes
 from radiotools import helper as hp
@@ -157,6 +157,10 @@ class DetKernel(icetray.I3Module):
 						dT=this_dT,
 						amplifier_filter_response=amplifier_filter_response
 						)
+
+					# title="particle{}_sol{}".format(particle.minorID,iR)
+					# util_plotting.plot_field_and_trace(this_efield, voltage_trace, 
+					# 	voltage_trace_after_amps_filters, info=title)
 
 
 	def Physics(self, frame):
