@@ -1,6 +1,7 @@
 # python includes
 import numpy as np
 import os
+from scipy.interpolate import interp1d
 
 from icecube import icetray, dataclasses, icetradio
 from icecube.dataclasses import I3Particle
@@ -62,6 +63,55 @@ def fold_efields(efield, zenith, azimuth, antenna_orientation, antenna_pattern):
 	voltage_fft[np.where(ff < 5 * units.MHz)] = 0.
 	voltage_trace = fft.freq2time(voltage_fft, efield.eR.samplingRate)
 	return voltage_trace
+
+def apply_amplifier_filter(voltage_trace, dT, amplifier_filter_response):
+
+	"""
+	A function to apply amplifier+filter responses to a voltage trace
+
+	Apply the complex response of the amplifier and filter (magnitude and phase)
+	to a voltage trace, and return the trace after amplification
+
+	Parameters
+	----------
+	voltage_trace: array
+		the trace to which we want to apply the amplifier and filter
+
+	dT: float
+		the time between samples of the voltage trace
+
+	azimuth: float
+		the azimuth angle (in radians!) of the signal incident on the antenna
+
+	amplifier_filter_response: array
+		The dict containing the amplifier + filter response
+		As loaded in the load_filter_amplifier_response function
+	
+
+	Returns
+	-------
+	trace: 
+		the voltage trace that will be observed after applying the amps + filters
+
+	"""
+	orig_frequencies = amplifier_filter_response['frequencies']
+	orig_phase = amplifier_filter_response['phase']
+	orig_gain = amplifier_filter_response['gain']
+
+	# interpolate the phase and gain
+	interp_phase = interp1d(orig_frequencies, np.unwrap(orig_phase), bounds_error=False, fill_value=0)
+	interp_gain = interp1d(orig_frequencies, orig_gain, bounds_error=False, fill_value=0)
+
+	num_samples = len(voltage_trace) # the number of samples
+	frequencies = np.fft.rfftfreq(num_samples, dT)
+	gain = interp_gain(frequencies)
+	phase = np.exp(1j * interp_phase(frequencies))
+
+	the_fft = fft.freq2time(voltage_trace, 1./dT)
+	the_fft*=gain*phase
+	the_result_trace = fft.time2freq(the_fft, 1./dT)
+	return the_result_trace
+					
 
 def load_filter_amplifier_response(amplifier_filter_model):
 	"""

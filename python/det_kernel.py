@@ -121,6 +121,7 @@ class DetKernel(icetray.I3Module):
 		for iceantkey, g in antgeomap:
 
 			antenna_pattern = self.antenna_model_dict[g.antennaModel]
+			amplifier_filter_response = self.amplifier_model_dict[g.amplifierFilterModel]
 			antenna_orientation = np.asarray([g.orientation.theta, g.orientation.phi, g.rotation.theta, g.rotation.phi])
 
 			# loop over vertices
@@ -141,6 +142,8 @@ class DetKernel(icetray.I3Module):
 					this_phi = this_signal.arrival_phi
 					this_efield = this_signal.field_watt #I3EField with attenuation and pol included
 
+					this_dT = 1./ this_efield.eR.samplingRate
+
 					# now, we must fold the Efield with a model of the antenna
 					voltage_trace = det_response.fold_efields(efield=this_efield, 
 						zenith=this_theta,
@@ -149,8 +152,11 @@ class DetKernel(icetray.I3Module):
 						antenna_pattern=antenna_pattern)
 
 					# now, we must apply the amplifier response
-					# for purposes of icetradio, we will always require the user
-					# to provide an amplifier file
+					voltage_trace_after_amps_filters = det_response.apply_amplifier_filter(
+						voltage_trace=voltage_trace,
+						dT=this_dT,
+						amplifier_filter_response=amplifier_filter_response
+						)
 
 
 	def Physics(self, frame):
