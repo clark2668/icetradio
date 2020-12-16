@@ -107,8 +107,8 @@ def apply_amplifier_filter(voltage_trace, dT, amplifier_filter_response):
 	gain = interp_gain(frequencies)
 	phase = np.exp(1j * interp_phase(frequencies))
 
-	the_fft = fft.freq2time(voltage_trace, 1./dT)
-	the_fft*=gain*phase
+	the_fft = fft.time2freq(voltage_trace, 1./dT)
+	the_fft*=(gain*phase)
 	the_result_trace = fft.time2freq(the_fft, 1./dT)
 	return the_result_trace
 					
