@@ -97,6 +97,12 @@ class DetKernel(icetray.I3Module):
 		self.antenna_model_dict = {}
 		det_response.load_antenna_responses(self.antgeomap, self.antenna_model_dict)
 
+		# amplifiers
+		#############################################
+		#############################################
+		self.amplifier_model_dict = {}
+		det_response.load_amplifier_filter_responses(self.antgeomap, self.amplifier_model_dict)
+
 	def run_det_kernel(self, frame):
 
 		# we'll need an array of frequencies at which we'll calculate attens etc
@@ -141,6 +147,10 @@ class DetKernel(icetray.I3Module):
 						azimuth=this_phi,
 						antenna_orientation=antenna_orientation,
 						antenna_pattern=antenna_pattern)
+
+					# now, we must apply the amplifier response
+					# for purposes of icetradio, we will always require the user
+					# to provide an amplifier file
 
 
 	def Physics(self, frame):

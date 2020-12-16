@@ -1,5 +1,6 @@
 # python includes
 import numpy as np
+import os
 
 from icecube import icetray, dataclasses, icetradio
 from icecube.dataclasses import I3Particle
@@ -61,6 +62,66 @@ def fold_efields(efield, zenith, azimuth, antenna_orientation, antenna_pattern):
 	voltage_fft[np.where(ff < 5 * units.MHz)] = 0.
 	voltage_trace = fft.freq2time(voltage_fft, efield.eR.samplingRate)
 	return voltage_trace
+
+def load_filter_amplifier_response(amplifier_filter_model):
+	"""
+	A function to do load the amplifier+filter responses
+
+	The intput should be a ASCII file
+	It should be the style of the ARA filter/amps file
+	https://github.com/ara-software/AraSim/blob/master/data/ARA_Electronics_TotalGain_TwoFilters.txt
+	We will always skip the first three rows
+	It should be a csv file, with the first column being frequency in MHz
+	The second column being gain in linear units
+	The third column being the phase in radians
+	The files should be put in the icetradio "data" directory
+
+	Parameters
+	----------
+	amplifier_filter_model: string
+		name of the amplifier filter model to be used (no .txt)
+	
+	Returns
+	-------
+	antenna_model_dict: dictionary
+		dictionary containing the gain and phases
+	"""
+	data = np.loadtxt(os.path.join(os.environ['icetradio_path'],'data',amplifier_filter_model+'.txt'), 
+		skiprows=3, delimiter=',')
+	response = {}
+	response['frequencies'] = data[:,0]*units.MHz  #radians
+	response['gain'] = data[:,1]                   #unitless
+	response['phase'] = data[:, 2] * units.rad     #radians
+	return response
+
+def load_amplifier_filter_responses(antgeomap, amplifier_model_dict):
+	"""
+	A function to do load the amplifier/filter responses
+
+	Load all the response objects for every amplifier in the geomap.
+	Insert them as a key in the dictionary so we can call them later
+
+	Parameters
+	----------
+	antgeomap: I3IceAntennaGeometry geometry object
+		a map of IceAntKeys to IceAntGeo objects
+	
+	amplifier_model_dict: dictionary
+		dictionary of amplifier+filter responses
+
+	Returns
+	-------
+	void
+	"""
+	for iceantkey, g in antgeomap:
+		
+		amplifier_filter_model = g.amplifierFilterModel # get the amplifier + filter model
+
+		if amplifier_filter_model not in amplifier_model_dict.keys():
+			# only add if it's not already in the dict
+
+			the_model = load_filter_amplifier_response(amplifier_filter_model)
+			amplifier_model_dict[amplifier_filter_model] = the_model
 
 
 def load_antenna_responses(antgeomap, antenna_pattern_dict):
