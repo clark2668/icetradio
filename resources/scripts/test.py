@@ -45,7 +45,7 @@ tray.AddModule(signal_gen.TreeThinner, "TreeThinner")
 tray.AddModule(nu_kernel.NuKernel, "NuKernel")
 tray.AddModule(det_kernel.DetKernel, "DetKernel")
 tray.Add("I3Writer", filename="quick.i3.zst")
-tray.Execute(30)
+tray.Execute(3)
 
 
 # dummy code for rapid prototyping
