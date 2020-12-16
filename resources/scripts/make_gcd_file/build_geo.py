@@ -21,6 +21,7 @@ def MakeAntennaGeo(antFile, iAnt):
 	RotationPhi = np.deg2rad(antFile['RotationPhi'][iAnt])
 	AntennaType = antFile['AntennaType'][iAnt]
 	AntennaModel = antFile['AntennaModel'][iAnt]
+	AmplifierFilterModel = antFile['AmplifierFilterModel'][iAnt]
 
 	iceantennaGeo = dataclasses.I3IceAntennaGeo()
 	iceantennaGeo.position = dataclasses.I3Position(x, y , z)
@@ -39,6 +40,7 @@ def MakeAntennaGeo(antFile, iAnt):
 		iceantennaGeo.antennaType = dataclasses.I3IceAntennaGeo.IceAntennaType.lpda
 
 	iceantennaGeo.antennaModel = AntennaModel
+	iceantennaGeo.amplifierFilterModel = AmplifierFilterModel
 
 	return iceantennaGeo
 
